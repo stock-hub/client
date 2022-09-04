@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import { useLocation } from "react-router-dom"
 import productService from "../../../services/products.service"
@@ -10,7 +10,7 @@ const NewProductForm = () => {
         description: '',
         price: '',
         imageUrl: '',
-        onSell: false,
+        onSell: "off",
         tags: []
     })
 
@@ -24,19 +24,6 @@ const NewProductForm = () => {
         setProduct({
             ...product,
             [name]: value
-        })
-    }
-
-    const handleTags = e => {
-        const { value } = e.target
-
-        const tagsArr = []
-
-        tagsArr.push(value)
-
-        setProduct({
-            ...product,
-            tags: tagsArr
         })
     }
 
@@ -70,6 +57,23 @@ const NewProductForm = () => {
             .then(() => navigate('/admin/productos?page=1'))
             .catch(err => console.log(err))
     }
+
+    useEffect(() => {
+        window.onmousedown = function (e) {
+            const el = e.target
+            if (el.tagName.toLowerCase() === 'option' && el.parentNode.hasAttribute('multiple')) {
+                e.preventDefault()
+
+                // toggle selection
+                if (el.hasAttribute('selected')) el.removeAttribute('selected')
+                else el.setAttribute('selected', '')
+
+                // hack to correct buggy behavior
+                const select = el.parentNode.cloneNode(true)
+                el.parentNode.parentNode.replaceChild(select, el.parentNode)
+            }
+        }
+    })
 
     return (
         <Form onSubmit={handleSubmit}>
@@ -123,37 +127,13 @@ const NewProductForm = () => {
                 name="onSell"
                 onChange={handleInputChange}
             />
-            <div className="productTags">
-                <p>Etiquetas:</p>
-                <Form.Check
-                    type="switch"
-                    id="custom-switch"
-                    label="Herramientas"
-                    onChange={handleTags}
-                    name="Herramientas"
-                    checked="Herramientas"
-                />
-                <Form.Check
-                    type="switch"
-                    id="custom-switch"
-                    label="Maquinaria"
-                    onChange={handleTags}
-                    name="Maquinaria"
-                    checked="Maquinaria"
-                />
-                <Form.Check
-                    type="switch"
-                    id="custom-switch"
-                    label="Materiales"
-                    onChange={handleTags}
-                    name="Materiales"
-                    checked="Materiales"
-                />
-            </div>
-            <Button variant="primary" type="submit">
-                Submit
-            </Button>
-        </Form>
+            <Form.Select aria-label="Default select example" name="tags" multiple>
+                <option value="Herramientas">Herramientas</option>
+                <option value="Maquinaria">Maquinaria</option>
+                <option value="Materiales">Materiales</option>
+            </Form.Select>
+            <Button variant="primary" type="submit" disabled={loadingImage}>{loadingImage ? 'Espere...' : 'Enviar'}</Button>
+        </Form >
     )
 }
 
