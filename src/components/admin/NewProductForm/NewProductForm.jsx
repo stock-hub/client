@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
+import "./NewProductForm.css"
+import { useState } from "react"
 import { Button, Form } from "react-bootstrap"
-import { useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
 import uploadService from "../../../services/upload.services"
 
@@ -16,7 +17,7 @@ const NewProductForm = () => {
 
     const [loadingImage, setLoadingImage] = useState(false)
 
-    const navigate = useLocation()
+    const navigate = useNavigate()
 
     const handleInputChange = e => {
         const { name, value } = e.target
@@ -25,6 +26,32 @@ const NewProductForm = () => {
             ...product,
             [name]: value
         })
+    }
+
+    const handleSelect = e => {
+        e.preventDefault()
+
+        const options = e.target.options
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected && !product.tags.includes(options[i].value)) {
+                setProduct({
+                    ...product,
+                    tags: [...product.tags, options[i].value]
+                })
+            } else if (options[i].selected && product.tags.includes(options[i].value)) {
+                const tagIndex = product.tags.indexOf(options[i].value)
+
+                if (tagIndex > -1) {
+                    product.tags.splice(tagIndex, 1)
+
+                    setProduct({
+                        ...product,
+                        tags: product.tags
+                    })
+                }
+            }
+        }
     }
 
     const uploadProductImages = (e) => {
@@ -50,7 +77,7 @@ const NewProductForm = () => {
     }
 
     const handleSubmit = e => {
-        e.prevetDefault()
+        e.preventDefault()
 
         productService
             .newProduct(product)
@@ -58,22 +85,13 @@ const NewProductForm = () => {
             .catch(err => console.log(err))
     }
 
-    useEffect(() => {
-        window.onmousedown = function (e) {
-            const el = e.target
-            if (el.tagName.toLowerCase() === 'option' && el.parentNode.hasAttribute('multiple')) {
-                e.preventDefault()
+    const removeSelectAttr = (e) => {
+        const el = e.target.parentNode
 
-                // toggle selection
-                if (el.hasAttribute('selected')) el.removeAttribute('selected')
-                else el.setAttribute('selected', '')
-
-                // hack to correct buggy behavior
-                const select = el.parentNode.cloneNode(true)
-                el.parentNode.parentNode.replaceChild(select, el.parentNode)
-            }
-        }
-    })
+        setTimeout(() => {
+            el.selectedIndex = -1
+        }, 90)
+    }
 
     return (
         <Form onSubmit={handleSubmit}>
@@ -127,11 +145,14 @@ const NewProductForm = () => {
                 name="onSell"
                 onChange={handleInputChange}
             />
-            <Form.Select aria-label="Default select example" name="tags" multiple>
-                <option value="Herramientas">Herramientas</option>
-                <option value="Maquinaria">Maquinaria</option>
-                <option value="Materiales">Materiales</option>
+            <h6>Seleccionar etiquetas:</h6>
+            <Form.Select aria-label="Default select example" name="tags" multiple onChange={handleSelect}>
+                <option onClick={removeSelectAttr} value="Herramientas">Herramientas</option>
+                <option onClick={removeSelectAttr} value="Maquinaria">Maquinaria</option>
+                <option onClick={removeSelectAttr} value="Materiales">Materiales</option>
             </Form.Select>
+            <br />
+            <p>Etiquetas seleccionadas: {product.tags.map((el, idx) => <span key={idx} className="newProductTags">{el}</span>)}</p>
             <Button variant="primary" type="submit" disabled={loadingImage}>{loadingImage ? 'Espere...' : 'Enviar'}</Button>
         </Form >
     )
