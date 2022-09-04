@@ -24,8 +24,8 @@ class ProductService {
         return this.axios.get(`/${productId}/view`)
     }
 
-    newProduct(body) {
-        return this.axios.post('/new', body)
+    newProduct(product) {
+        return this.axios.post('/new', product)
     }
 
     deleteProduct(productId) {

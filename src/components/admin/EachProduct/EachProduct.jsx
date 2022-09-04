@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import { Button, Col, Row } from "react-bootstrap"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ProductContext } from "../../../context/product.context"
 import productService from "../../../services/products.service"
 import './EachProduct.css'
@@ -8,7 +8,7 @@ import './EachProduct.css'
 const EachProduct = ({ product }) => {
 
     const { getProducts } = useContext(ProductContext)
-    const navigate = useLocation()
+    const navigate = useNavigate()
 
     const deleteProduct = () => {
         productService
@@ -25,14 +25,14 @@ const EachProduct = ({ product }) => {
             <div className="eachAdminProduct">
                 <Row>
                     <Col md="2">
-                        <img src={product.imageUrl[0]} alt="product image" className="AdminProductImg" />
+                        <img src={product.imageUrl[0]} alt={product.name} className="AdminProductImg" />
                     </Col>
                     <Col md="8">
                         <p><strong>{product.name}</strong></p>
                         <p>${product.price}</p>
                         {
                             product.tags.map((tag) => {
-                                <p class="AdminProductTag">{tag}</p>
+                                return <p class="AdminProductTag">{tag}</p>
                             })
                         }
                     </Col>
