@@ -3,6 +3,7 @@ import { useContext, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
 import { ProductContext } from '../../../context/product.context'
+import './ProductList.css'
 
 const ProductList = () => {
     const [pageParams, setPageParams] = useSearchParams()
@@ -37,7 +38,9 @@ const ProductList = () => {
         window.scrollTo(0, 0)
     }
 
-    useEffect(() => changePage(pageNumber), [pageNumber])
+    useEffect(() => {
+        changePage(pageNumber)// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pageNumber])
 
     return (
         <>
@@ -53,7 +56,7 @@ const ProductList = () => {
                             })
                         }
                         <br />
-                        <div>
+                        <div className='productPaginator'>
                             <ButtonGroup aria-label="Basic example">
                                 <Button variant="outline-primary"
                                     onClick={firstPage}>{"<<"}</Button>

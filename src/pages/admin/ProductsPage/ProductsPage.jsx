@@ -7,7 +7,9 @@ const ProductsPage = () => {
         <>
             <Container>
                 <h3>Productos</h3>
-                <Link to="/admin/productos/nuevo">Añadir nuevo producto</Link>
+                <Link to="/admin/productos/nuevo" className='btn btn-outline-primary'>Añadir nuevo producto</Link>
+                <br />
+                <br />
                 <ProductList />
             </Container>
         </>
