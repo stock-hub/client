@@ -7,7 +7,7 @@ import HomePage from "../pages/HomePage/HomePage"
 import { useContext } from "react"
 import { AuthContext } from "../context/auth.context"
 import PageNotFound from "../pages/PageNotFound/PageNotFound"
-import ViewProduct from "../pages/admin/ViewProduct/ViewProduct"
+import ViewProduct from "../pages/ViewProduct/ViewProduct"
 import NewProductPage from "../pages/admin/NewProductPage/NewProductPage"
 
 
