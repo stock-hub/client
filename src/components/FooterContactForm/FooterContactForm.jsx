@@ -13,7 +13,7 @@ const FooterContactForm = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <InputGroup className="mb-3">
             <InputGroup.Text id="basic-addon1">+57</InputGroup.Text>
-            <input type="number" className="form-control" placeholder="Número de teléfono" aria-label="Número de teléfono" min="0" aria-describedby="basic-addon1" />
+            <input type="number" className="form-control footerFormTel" placeholder="Número de teléfono" aria-label="Número de teléfono" min="0" aria-describedby="basic-addon1" />
           </InputGroup>
         </Form.Group>
 
