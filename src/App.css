@@ -1,0 +1,14 @@
+.mobileBreaker {
+  display: none;
+}
+
+@media screen and (max-width: 480px) {
+  .mobileBreaker {
+    display: block;
+    height: 5px;
+    width: 80%;
+    margin: 1rem auto;
+    border: none;
+    background-color: rgb(255, 0, 0);
+  }
+}
