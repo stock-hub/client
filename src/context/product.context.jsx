@@ -8,7 +8,6 @@ function ProductProviderWrapper(props) {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
 
-
     const getProducts = () => {
         productService
             .getProductsList(page)
@@ -21,13 +20,15 @@ function ProductProviderWrapper(props) {
 
     const changePage = num => setPage(num)
 
-    useEffect(() => getProducts(), [page])
+    useEffect(() => {
+        getProducts() // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page])
     useEffect(() => {
         changePage()
     }, [])
 
     return (
-        <ProductContext.Provider value={{ productsList, getProducts, changePage, page, totalPages }}>
+        <ProductContext.Provider value={{ productsList, getProducts, changePage, page, totalPages, setProductsList }}>
             {props.children}
         </ProductContext.Provider>
     )

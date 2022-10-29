@@ -16,6 +16,10 @@ class ProductService {
         })
     }
 
+    getAllProducts(search_query) {
+        return this.axios.get(`/filter/${search_query}`)
+    }
+
     getProductsList(page) {
         return this.axios.get(`/${page}`)
     }

@@ -31,8 +31,8 @@ const EachProduct = ({ product }) => {
                         <p><strong>{product.name}</strong></p>
                         <p>${product.price}</p>
                         {
-                            product.tags.map((tag) => {
-                                return <p class="AdminProductTag">{tag}</p>
+                            product.tags.map((tag, idx) => {
+                                return <p key={idx} className="AdminProductTag">{tag}</p>
                             })
                         }
                     </Col>

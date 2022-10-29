@@ -2,3 +2,16 @@
   text-align: center;
   margin-bottom: 1rem;
 }
+
+.productInputFilter {
+  width: 20%;
+  display: inline-block;
+}
+
+.productsFilter {
+  margin-bottom: 2rem;
+}
+
+.productsFilter button {
+  margin-left: 1rem;
+}

@@ -4,10 +4,14 @@ import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
 import { ProductContext } from '../../../context/product.context'
 import './ProductList.css'
+import productService from '../../../services/products.service'
+import { useState } from 'react'
 
 const ProductList = () => {
     const [pageParams, setPageParams] = useSearchParams()
-    const { productsList, changePage, totalPages } = useContext(ProductContext)
+    const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
+    const [query, setQuery] = useState('')
+    const [buttonSearch, setButtonSearch] = useState('')
     let pageNumber = pageParams.get("page")
 
     const firstPage = () => {
@@ -38,12 +42,54 @@ const ProductList = () => {
         window.scrollTo(0, 0)
     }
 
+    const getFilteredProducts = () => {
+        if (buttonSearch !== '') {
+            productService
+                .getAllProducts(buttonSearch)
+                .then(({ data }) => {
+                    setProductsList(data)
+                })
+                .catch(err => console.log(err))
+        } else {
+            return []
+        }
+    }
+
+    const handleInputChange = e => setQuery(e.target.value)
+
+    const setSearchQuery = () => setButtonSearch(query)
+
+    const resetFilter = () => {
+        setQuery('')
+        setButtonSearch('')
+        getProducts()
+    }
+
     useEffect(() => {
-        changePage(pageNumber)// eslint-disable-next-line react-hooks/exhaustive-deps
+        changePage(pageNumber) // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageNumber])
+
+    useEffect(() => {
+        getFilteredProducts() // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [buttonSearch])
+
+    useEffect(() => {
+        resetFilter() // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return (
         <>
+            <div className='productsFilter'>
+                <input
+                    className='productInputFilter form-control'
+                    type="text"
+                    placeholder='Buscar producto'
+                    onChange={handleInputChange}
+                    value={query}
+                />
+                <button className='btn btn-outline-primary' onClick={setSearchQuery}>Buscar</button>
+                <button className='btn btn-outline-primary' onClick={resetFilter}>Limpiar filtros</button>
+            </div>
             {
                 productsList.length !== 0
                     ?
