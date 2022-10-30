@@ -3,14 +3,16 @@ import { useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
-import uploadService from "../../../services/upload.services"
+import cloudImagesService from "../../../services/cloud_images.service"
+import { useContext } from "react"
+import { ProductContext } from "../../../context/product.context"
 
 const NewProductForm = () => {
     const [product, setProduct] = useState({
         name: '',
         description: '',
         price: '',
-        imageUrl: '',
+        imageUrl: [],
         onSell: "off",
         tags: []
     })
@@ -63,7 +65,7 @@ const NewProductForm = () => {
             uploadData.append("imageUrl", e.target.files[i])
         }
 
-        uploadService
+        cloudImagesService
             .uploadImage(uploadData)
             .then(({ data }) => {
                 const newImages = [...product.imageUrl, ...data.cloudinaryUrls]
@@ -91,6 +93,25 @@ const NewProductForm = () => {
         setTimeout(() => {
             el.selectedIndex = -1
         }, 90)
+    }
+
+    const deleteImages = (url) => {
+        cloudImagesService
+            .deleteImage(url)
+            .then(() => {
+                const images = product.imageUrl
+                const imageIndex = images.indexOf(url)
+                console.log("old images: ", images)
+
+                if (imageIndex > -1) {
+                    images.splice(imageIndex, 1)
+                }
+
+                setProduct({
+                    ...product,
+                    imageUrl: images
+                })
+            })
     }
 
     return (
@@ -138,6 +159,23 @@ const NewProductForm = () => {
                     onChange={uploadProductImages}
                 />
             </Form.Group>
+            <div className="imagesPreview">
+                {
+                    product.imageUrl?.map((image, idx) => {
+                        return <div key={idx}>
+                            <button
+                                onClick={() => deleteImages(image)}
+                                className={`deleteImage image-${idx}`}
+                            >
+                                <i className="fa-solid fa-xmark"></i>
+                            </button>
+                            <picture className={`preview preview-${idx + 1}`}>
+                                <img src={image} alt={`preview-${idx + 1}`} />
+                            </picture>
+                        </div>
+                    })
+                }
+            </div>
             <Form.Check
                 type="switch"
                 id="custom-switch"
