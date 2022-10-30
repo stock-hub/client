@@ -4,8 +4,6 @@ import { Button, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
 import cloudImagesService from "../../../services/cloud_images.service"
-import { useContext } from "react"
-import { ProductContext } from "../../../context/product.context"
 
 const NewProductForm = () => {
     const [product, setProduct] = useState({
