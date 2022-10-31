@@ -1,9 +1,10 @@
 import "./NewProductForm.css"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
-import uploadService from "../../../services/upload.services"
+import cloudImagesService from "../../../services/cloud_images.service"
+import { MessageContext } from "../../../context/userMessage.context"
 
 const NewProductForm = () => {
     const [product, setProduct] = useState({
@@ -16,6 +17,7 @@ const NewProductForm = () => {
     })
 
     const [loadingImage, setLoadingImage] = useState(false)
+    const { setShowMessage, setMessageInfo } = useContext(MessageContext)
 
     const navigate = useNavigate()
 
@@ -63,7 +65,7 @@ const NewProductForm = () => {
             uploadData.append("imageUrl", e.target.files[i])
         }
 
-        uploadService
+        cloudImagesService
             .uploadImage(uploadData)
             .then(({ data }) => {
                 const newImages = [...product.imageUrl, ...data.cloudinaryUrls]
@@ -73,7 +75,17 @@ const NewProductForm = () => {
                     imageUrl: newImages,
                 })
             })
-            .catch((err) => console.log(err))
+            .catch((err) => {
+                console.log(err)
+                if (product.imageUrl.length > 0) {
+                    setLoadingImage(false)
+                }
+                setShowMessage(true)
+                setMessageInfo({
+                    title: 'Error',
+                    desc: 'Seleccione imagenes antes de crear el producto.'
+                })
+            })
     }
 
     const handleSubmit = e => {
@@ -82,7 +94,10 @@ const NewProductForm = () => {
         productService
             .newProduct(product)
             .then(() => navigate('/admin/productos?page=1'))
-            .catch(err => console.log(err))
+            .catch((err) => {
+                setShowMessage(true)
+                setMessageInfo({ title: 'Error', desc: err.message })
+            })
     }
 
     const removeSelectAttr = (e) => {
@@ -91,6 +106,24 @@ const NewProductForm = () => {
         setTimeout(() => {
             el.selectedIndex = -1
         }, 90)
+    }
+
+    const deleteImages = (url) => {
+        cloudImagesService
+            .deleteImage(url)
+            .then(() => {
+                const images = product.imageUrl
+                const imageIndex = images.indexOf(url)
+
+                if (imageIndex > -1) {
+                    images.splice(imageIndex, 1)
+                }
+
+                setProduct({
+                    ...product,
+                    imageUrl: images
+                })
+            })
     }
 
     return (
@@ -138,6 +171,24 @@ const NewProductForm = () => {
                     onChange={uploadProductImages}
                 />
             </Form.Group>
+            <div className="imagesPreview">
+                {
+                    product.imageUrl?.map((image, idx) => {
+                        return <div key={idx}>
+                            <button
+                                type="button"
+                                onClick={() => deleteImages(image)}
+                                className={`deleteImage image-${idx}`}
+                            >
+                                <i className="fa-solid fa-xmark"></i>
+                            </button>
+                            <picture className={`preview preview-${idx + 1}`}>
+                                <img src={image} alt={`preview-${idx + 1}`} />
+                            </picture>
+                        </div>
+                    })
+                }
+            </div>
             <Form.Check
                 type="switch"
                 id="custom-switch"
@@ -152,8 +203,16 @@ const NewProductForm = () => {
                 <option onClick={removeSelectAttr} value="Materiales">Materiales</option>
             </Form.Select>
             <br />
-            <p>Etiquetas seleccionadas: {product.tags.map((el, idx) => <span key={idx} className="newProductTags">{el}</span>)}</p>
-            <Button variant="primary" type="submit" disabled={loadingImage}>{loadingImage ? 'Espere...' : 'Enviar'}</Button>
+            <p>
+                Etiquetas seleccionadas: {product.tags.map((el, idx) => <span key={idx} className="newProductTags">{el}</span>)}
+            </p>
+            <Button
+                variant="primary"
+                type="submit"
+                disabled={loadingImage}
+            >
+                {loadingImage ? 'Espere...' : 'Enviar'}
+            </Button>
         </Form >
     )
 }
