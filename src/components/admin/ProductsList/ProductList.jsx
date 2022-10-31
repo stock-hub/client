@@ -8,7 +8,13 @@ import productService from '../../../services/products.service'
 
 const ProductList = () => {
     const [pageParams, setPageParams] = useSearchParams()
-    const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
+    const {
+        productsList,
+        changePage,
+        totalPages,
+        setProductsList,
+        getProducts
+    } = useContext(ProductContext)
     const [query, setQuery] = useState('')
     const [buttonSearch, setButtonSearch] = useState('')
     let pageNumber = pageParams.get("page")
@@ -86,8 +92,12 @@ const ProductList = () => {
                     onChange={handleInputChange}
                     value={query}
                 />
-                <button className='btn btn-outline-primary' onClick={setSearchQuery}>Buscar</button>
-                <button className='btn btn-outline-primary' onClick={resetFilter}>Limpiar filtros</button>
+                <button
+                    className='btn btn-outline-primary'
+                    onClick={setSearchQuery}>Buscar</button>
+                <button
+                    className='btn btn-outline-primary'
+                    onClick={resetFilter}>Limpiar filtros</button>
             </div>
             {
                 productsList.length !== 0
