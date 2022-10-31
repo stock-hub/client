@@ -4,38 +4,3 @@
     border-radius: 5px;
     margin-right: 5px;
 }
-
-.imagesPreview {
-    display: flex;
-    justify-content: space-around;
-    margin: 2rem 0;
-}
-
-.imagesPreview>div {
-    padding: 10px;
-}
-
-.preview img {
-    width: 10rem;
-    height: 10rem;
-    border-radius: 5px;
-    object-fit: cover;
-}
-
-.deleteImage {
-    background: none;
-    border: 2px solid red;
-    border-radius: 50%;
-    height: 30px;
-    width: 30px;
-    color: red;
-    font-size: 1.5rem;
-    position: absolute;
-}
-
-.deleteImage i {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: 5px;
-}

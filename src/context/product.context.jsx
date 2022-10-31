@@ -24,9 +24,8 @@ function ProductProviderWrapper(props) {
         getProducts() // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page])
     useEffect(() => {
-        getProducts() // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page])
-    useEffect(() => changePage(), [])
+        changePage()
+    }, [])
 
     return (
         <ProductContext.Provider value={{ productsList, getProducts, changePage, page, totalPages, setProductsList }}>
