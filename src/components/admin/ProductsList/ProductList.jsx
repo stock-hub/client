@@ -1,9 +1,9 @@
+import './ProductList.css'
 import { Spinner, Button, ButtonGroup } from 'react-bootstrap'
 import { useContext, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
 import { ProductContext } from '../../../context/product.context'
-import './ProductList.css'
 import productService from '../../../services/products.service'
 import { useState } from 'react'
 
