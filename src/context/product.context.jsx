@@ -20,15 +20,20 @@ function ProductProviderWrapper(props) {
 
     const changePage = num => setPage(num)
 
+    const deleteProduct = (id) => {
+        productService
+            .deleteProduct(id)
+            .then(() => getProducts())
+            .catch(err => console.log(err))
+    }
+
     useEffect(() => {
         getProducts() // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page])
-    useEffect(() => {
-        changePage()
-    }, [])
+    useEffect(() => changePage(), [])
 
     return (
-        <ProductContext.Provider value={{ productsList, getProducts, changePage, page, totalPages, setProductsList }}>
+        <ProductContext.Provider value={{ productsList, getProducts, changePage, page, totalPages, setProductsList, deleteProduct }}>
             {props.children}
         </ProductContext.Provider>
     )
