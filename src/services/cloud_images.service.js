@@ -1,6 +1,6 @@
 import axios from "axios"
 
-class UploadService {
+class CloudImagesService {
     constructor() {
         this.api = axios.create({
             baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -26,6 +26,6 @@ class UploadService {
     }
 }
 
-const uploadService = new UploadService()
+const cloudImagesService = new CloudImagesService()
 
-export default uploadService
+export default cloudImagesService
