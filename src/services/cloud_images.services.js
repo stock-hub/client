@@ -3,7 +3,7 @@ import axios from "axios"
 class UploadService {
     constructor() {
         this.api = axios.create({
-            baseURL: `${process.env.REACT_APP_API_URL}/upload_image`,
+            baseURL: `${process.env.REACT_APP_API_URL}`,
         })
 
         this.api.interceptors.request.use((config) => {
@@ -18,7 +18,11 @@ class UploadService {
     }
 
     uploadImage(imageForm) {
-        return this.api.post("/", imageForm)
+        return this.api.post("/upload_image", imageForm)
+    }
+
+    deleteImage(image_url) {
+        return this.api.post(`/delete_image/&url=${encodeURIComponent(image_url)}`)
     }
 }
 

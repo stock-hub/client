@@ -3,7 +3,7 @@ import { useContext, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
-import cloudImagesService from "../../../services/cloud_images.service"
+import cloudImagesService from "../../../services/cloud_images.services"
 import { MessageContext } from "../../../context/userMessage.context"
 
 const NewProductForm = () => {
@@ -11,7 +11,7 @@ const NewProductForm = () => {
         name: '',
         description: '',
         price: '',
-        imageUrl: '',
+        imageUrl: [],
         onSell: "off",
         tags: []
     })
