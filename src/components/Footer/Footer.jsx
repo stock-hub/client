@@ -14,7 +14,6 @@ const Footer = () => {
               <p><strong>Dirección:</strong> Cra 2 # 11 - 28 Barrio: Bolivar</p>
               <p>Yumbo - Valle del Cauca.</p>
             </div>
-            <img className="footerImg" src="https://res.cloudinary.com/andresgarcia/image/upload/v1666454559/la2da/Page%20Assets/Screenshot_2022-10-22_at_18.01.12_duyfgu.png" alt="Shop map location" />
             <hr className="mobileBreaker" />
           </Col>
           <Col md={4}>
