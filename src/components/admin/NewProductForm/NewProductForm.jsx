@@ -1,10 +1,10 @@
-import "./NewProductForm.css"
 import { useContext, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import productService from "../../../services/products.service"
 import cloudImagesService from "../../../services/cloud_images.service"
 import { MessageContext } from "../../../context/userMessage.context"
+import "./NewProductForm.css"
 
 const NewProductForm = () => {
     const [product, setProduct] = useState({
