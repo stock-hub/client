@@ -1,5 +1,5 @@
 import { Container } from "react-bootstrap"
-import NewProductForm from "../../../components/admin/NewProductForm/NewProductForm"
+import NewProductForm from "../../../components/dashboard/NewProductForm/NewProductForm"
 
 
 const NewProduct = () => {

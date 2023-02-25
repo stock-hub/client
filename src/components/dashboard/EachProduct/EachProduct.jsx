@@ -25,7 +25,7 @@ const EachProduct = ({ product }) => {
                         }
                     </Col>
                     <Col md="2" className="eachProductButtons">
-                        <Link className="btn btn-outline-info" to={`/productos/${product._id}`}>Ver</Link>
+                        <Link className="btn btn-outline-info" to={`/dashboard/products/${product._id}`}>Ver</Link>
                         {' '}<Button variant="outline-danger"
                             onClick={() => {
                                 deleteProduct(product._id)
