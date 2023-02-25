@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class AuthService {
     constructor() {
-        this.axios = axios.create({ baseURL: `${process.env.REACT_APP_API_URL}/admin` })
+        this.axios = axios.create({ baseURL: `${process.env.REACT_APP_API_URL}/dashboard` })
 
         this.axios.interceptors.request.use((config) => {
 

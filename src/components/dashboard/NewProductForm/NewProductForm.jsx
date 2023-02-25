@@ -93,7 +93,7 @@ const NewProductForm = () => {
 
         productService
             .newProduct(product)
-            .then(() => navigate('/admin/productos?page=1'))
+            .then(() => navigate('/dashboard/products?page=1'))
             .catch((err) => {
                 setShowMessage(true)
                 setMessageInfo({ title: 'Error', desc: err.message })
