@@ -5,12 +5,14 @@ import UserMessage from './components/UserMessage/UserMessage'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {
+  const excludedRoute = '/'
+
   return (
     <>
-      <NavBar />
+      {!excludedRoute.includes(window.location.pathname) && <NavBar />}
       <AppRoutes />
       <UserMessage />
-      <Footer />
+      {!excludedRoute.includes(window.location.pathname) && <Footer />}
     </>
   )
 }
