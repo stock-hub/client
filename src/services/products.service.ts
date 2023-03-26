@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { INewProduct } from '../types/product.type'
+import { Product } from '../types/product.type'
 
 class ProductService {
   axios: any
@@ -32,7 +32,7 @@ class ProductService {
     return this.axios.get(`/${productId}/view`)
   }
 
-  newProduct(product: INewProduct) {
+  newProduct(product: Product) {
     return this.axios.post('/new', product)
   }
 

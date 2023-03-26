@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import productService from '../../../services/products.service'
 import cloudImagesService from '../../../services/cloud_images.service'
 import { MessageContext } from '../../../context/userMessage.context'
-import { INewProduct } from '../../../types/product.type'
+import { Product } from '../../../types/product.type'
 import styled from 'styled-components'
 
 const NewProductTag = styled.span`
@@ -52,7 +52,7 @@ const DeleteImageBtn = styled.button`
 `
 
 export const NewProductForm: React.FC = () => {
-  const [product, setProduct] = useState<INewProduct>({
+  const [product, setProduct] = useState<Product>({
     name: '',
     description: '',
     price: '',

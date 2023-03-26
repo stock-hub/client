@@ -1,14 +1,5 @@
 export interface Product {
-  _id: string
-  name: string
-  description: string
-  price: number
-  imageUrl: Array<string>
-  tags: Array<string>
-  onSell: string
-}
-
-export interface INewProduct {
+  _id?: string
   name: string
   description: string
   price: string
