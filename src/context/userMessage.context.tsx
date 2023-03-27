@@ -14,9 +14,7 @@ export const MessageContext = createContext<IMessageContext>({
   setMessageInfo: () => {}
 })
 
-export const MessageProviderWrapper = (props: {
-  children: React.ReactNode
-}) => {
+export const MessageProviderWrapper = (props: { children: React.ReactNode }) => {
   const [showMessage, setShowMessage] = useState<boolean>(false)
   const [messageInfo, setMessageInfo] = useState<string>('')
 
@@ -27,9 +25,5 @@ export const MessageProviderWrapper = (props: {
     setMessageInfo
   }
 
-  return (
-    <MessageContext.Provider value={messageContextValue}>
-      {props.children}
-    </MessageContext.Provider>
-  )
+  return <MessageContext.Provider value={messageContextValue}>{props.children}</MessageContext.Provider>
 }

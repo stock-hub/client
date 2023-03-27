@@ -56,7 +56,7 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
           <Button
             variant='outline-danger'
             onClick={() => {
-              deleteProduct(product._id)
+              deleteProduct(product._id!)
               navigate(0)
             }}
           >

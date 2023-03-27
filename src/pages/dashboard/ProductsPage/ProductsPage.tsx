@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import ProductsList from '../../../components/dashboard/ProductsList/ProductsList'
+import { ProductsList } from '../../../components/dashboard/ProductsList/ProductsList'
 
 export const ProductsPage: React.FC = () => {
   return (

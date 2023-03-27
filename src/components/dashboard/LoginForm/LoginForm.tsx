@@ -15,7 +15,7 @@ interface ILoginResponse {
   }
 }
 
-const LoginForm: React.FC = () => {
+export const LoginForm: React.FC = () => {
   const [loginForm, setLoginForm] = useState<ILoginForm>({
     username: '',
     password: ''
@@ -51,13 +51,7 @@ const LoginForm: React.FC = () => {
     <Form onSubmit={handleSubmit}>
       <Form.Group className='mb-3' controlId='formBasicEmail'>
         <Form.Label>Username</Form.Label>
-        <Form.Control
-          type='text'
-          name='username'
-          value={loginForm.username}
-          onChange={handleInputChange}
-          required
-        />
+        <Form.Control type='text' name='username' value={loginForm.username} onChange={handleInputChange} required />
       </Form.Group>
 
       <Form.Group className='mb-3' controlId='formBasicPassword'>
@@ -76,5 +70,3 @@ const LoginForm: React.FC = () => {
     </Form>
   )
 }
-
-export default LoginForm

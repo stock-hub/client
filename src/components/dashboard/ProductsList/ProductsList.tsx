@@ -25,7 +25,7 @@ const ProductsFilter = styled.div`
   }
 `
 
-const ProductsList: React.FC = () => {
+export const ProductsList: React.FC = () => {
   const [pageParams, setPageParams] = useSearchParams()
   const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
   const [query, setQuery] = useState<string>('')
@@ -139,5 +139,3 @@ const ProductsList: React.FC = () => {
     </>
   )
 }
-
-export default ProductsList

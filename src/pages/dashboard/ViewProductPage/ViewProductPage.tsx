@@ -16,7 +16,7 @@ export const ViewProductPage: React.FC = () => {
     _id: '',
     name: '',
     description: '',
-    price: 0,
+    price: '',
     imageUrl: [],
     tags: [],
     onSell: ''

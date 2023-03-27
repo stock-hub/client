@@ -1,6 +1,6 @@
 import React from 'react'
-import LoginForm from '../../../components/dashboard/LoginForm/LoginForm'
 import { Container } from 'react-bootstrap'
+import { LoginForm } from '../../../components/dashboard/LoginForm/LoginForm'
 
 export const LoginPage: React.FC = () => {
   return (
