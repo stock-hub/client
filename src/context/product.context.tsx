@@ -17,7 +17,9 @@ export const ProductContext = createContext<ProductContextProps>({
   deleteProduct: () => {}
 })
 
-export const ProductProviderWrapper = (props: { children: React.ReactNode }) => {
+export const ProductProviderWrapper = (props: {
+  children: React.ReactNode
+}) => {
   const [productsList, setProductsList] = useState<Product[]>([])
   const [page, setPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
@@ -32,6 +34,10 @@ export const ProductProviderWrapper = (props: { children: React.ReactNode }) => 
       .catch((err: Error) => console.error(err))
   }, [page])
 
+  useEffect(() => {
+    getProducts()
+  }, [page])
+
   const changePage = (num: number) => setPage(num)
 
   const deleteProduct = (productId: string) => {
@@ -40,11 +46,6 @@ export const ProductProviderWrapper = (props: { children: React.ReactNode }) => 
       .then(() => getProducts())
       .catch((err: Error) => console.error(err))
   }
-
-  useEffect(() => {
-    changePage(1)
-    getProducts()
-  }, [page, getProducts])
 
   return (
     <ProductContext.Provider

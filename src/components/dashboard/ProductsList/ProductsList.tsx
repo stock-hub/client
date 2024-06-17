@@ -27,13 +27,14 @@ const ProductsFilter = styled.div`
 
 export const ProductsList: React.FC = () => {
   const [pageParams, setPageParams] = useSearchParams()
-  const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
+  const { productsList, changePage, totalPages, setProductsList, getProducts } =
+    useContext(ProductContext)
   const [query, setQuery] = useState<string>('')
   const [buttonSearch, setButtonSearch] = useState<string>('')
   const pageNumber: number | string = Number(pageParams.get('page')) || 1
 
   const firstPage = () => {
-    setPageParams({ page: pageNumber.toString() })
+    setPageParams({ page: '1' })
     window.scrollTo(0, 0)
   }
 
@@ -65,9 +66,9 @@ export const ProductsList: React.FC = () => {
         })
         .catch((err: Error) => console.error(err))
     } else {
-      return []
+      getProducts()
     }
-  }, [buttonSearch, setProductsList])
+  }, [buttonSearch, getProducts, setProductsList])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)
@@ -88,10 +89,6 @@ export const ProductsList: React.FC = () => {
   useEffect(() => {
     getFilteredProducts()
   }, [buttonSearch, getFilteredProducts])
-
-  useEffect(() => {
-    resetFilter()
-  }, [resetFilter, getProducts, setProductsList])
 
   return (
     <>
