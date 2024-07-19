@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect, useCallback } from 'react'
 import authService from '../services/auth.service'
 
 interface User {
@@ -13,7 +13,8 @@ interface AuthContextType {
   user: User | null
   setRememberUser: React.Dispatch<React.SetStateAction<boolean>>
   storeToken: (token: string) => void
-  authenticateUser: () => void
+  authenticateUser: () => Promise<void>
+  logInUser: (username: string, password: string) => Promise<void>
   logOutUser: () => void
 }
 
@@ -24,42 +25,80 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   setRememberUser: () => {},
   storeToken: () => {},
-  authenticateUser: () => {},
+  authenticateUser: async () => {},
+  logInUser: async () => {},
   logOutUser: () => {}
 })
 
-export const AuthProviderWrapper = ({ children }: { children: React.ReactNode }) => {
+interface LoginResponse {
+  data: {
+    authToken: string
+  }
+}
+
+export const AuthProviderWrapper = ({
+  children
+}: {
+  children: React.ReactNode
+}) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [rememberUser, setRememberUser] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
 
   const storeToken = (token: string) => {
-    rememberUser ? localStorage.setItem('authToken', token) : sessionStorage.setItem('authToken', token)
+    rememberUser
+      ? localStorage.setItem('authToken', token)
+      : sessionStorage.setItem('authToken', token)
   }
 
   const removeToken = () => {
-    rememberUser ? localStorage.removeItem('authToken') : sessionStorage.removeItem('authToken')
+    rememberUser
+      ? localStorage.removeItem('authToken')
+      : sessionStorage.removeItem('authToken')
   }
 
   const getToken = (): string | null => {
-    return rememberUser ? localStorage.getItem('authToken') : sessionStorage.getItem('authToken')
+    return rememberUser
+      ? localStorage.getItem('authToken')
+      : sessionStorage.getItem('authToken')
   }
 
-  const authenticateUser = () => {
+  const authenticateUser = useCallback(async () => {
     const storedToken = getToken()
 
     if (!storedToken) {
       logOutUser()
     } else {
-      authService
-        .verify(storedToken)
-        .then(({ data }: { data: User }) => {
-          setIsLoggedIn(true)
-          setIsLoading(false)
-          setUser(data)
-        })
-        .catch(() => logOutUser())
+      try {
+        await authService.verify(storedToken)
+
+        const currentUser = authService.getUser(storedToken)
+
+        setIsLoggedIn(true)
+        setIsLoading(false)
+        setUser(currentUser)
+      } catch {
+        logOutUser()
+        setIsLoading(false)
+      }
+    }
+  }, [])
+
+  const logInUser = async (username: string, password: string) => {
+    setIsLoading(true)
+
+    try {
+      const {
+        data: { authToken }
+      }: LoginResponse = await authService.login({ username, password })
+      storeToken(authToken)
+      await authenticateUser()
+    } catch (err) {
+      console.error(err)
+      logOutUser()
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -72,7 +111,7 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     authenticateUser()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authenticateUser])
 
   return (
     <AuthContext.Provider
@@ -84,6 +123,7 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
         setRememberUser,
         storeToken,
         authenticateUser,
+        logInUser,
         logOutUser
       }}
     >

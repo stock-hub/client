@@ -92,7 +92,10 @@ export const NewProductForm: React.FC = () => {
           ...product,
           tags: [...product.tags, options[i].value]
         })
-      } else if (options[i].selected && product.tags.includes(options[i].value)) {
+      } else if (
+        options[i].selected &&
+        product.tags.includes(options[i].value)
+      ) {
         const tagIndex = product.tags.indexOf(options[i].value)
 
         if (tagIndex > -1) {
@@ -127,7 +130,7 @@ export const NewProductForm: React.FC = () => {
         })
       })
       .catch((err: Error) => {
-        console.log(err)
+        console.error(err)
         if (product.imageUrl.length > 0) {
           setLoadingImage(false)
         }
@@ -136,7 +139,9 @@ export const NewProductForm: React.FC = () => {
       })
   }
 
-  const removeSelectAttr = (e: React.MouseEvent<HTMLOptionElement, MouseEvent>) => {
+  const removeSelectAttr = (
+    e: React.MouseEvent<HTMLOptionElement, MouseEvent>
+  ) => {
     const el = (e.target as Element).parentNode as HTMLSelectElement
 
     setTimeout(() => {
@@ -209,13 +214,23 @@ export const NewProductForm: React.FC = () => {
       </Form.Group>
       <Form.Group controlId='formFileMultiple' className='mb-3'>
         <Form.Label>Choose image files</Form.Label>
-        <Form.Control type='file' multiple required name='imageUrl' onChange={uploadProductImages} />
+        <Form.Control
+          type='file'
+          multiple
+          required
+          name='imageUrl'
+          onChange={uploadProductImages}
+        />
       </Form.Group>
       <ImagesPreview>
         {product.imageUrl?.map((image, idx) => {
           return (
             <div key={idx}>
-              <DeleteImageBtn type='button' onClick={() => deleteImages(image)} className={`image-${idx}`}>
+              <DeleteImageBtn
+                type='button'
+                onClick={() => deleteImages(image)}
+                className={`image-${idx}`}
+              >
                 <i className='fa-solid fa-xmark'></i>
               </DeleteImageBtn>
               <PicturePreview className={`preview preview-${idx + 1}`}>
@@ -233,7 +248,12 @@ export const NewProductForm: React.FC = () => {
         onChange={handleInputChange}
       />
       <h6>Choose tag:</h6>
-      <Form.Select aria-label='Default select example' name='tags' multiple onChange={handleSelect}>
+      <Form.Select
+        aria-label='Default select example'
+        name='tags'
+        multiple
+        onChange={handleSelect}
+      >
         <option onClick={removeSelectAttr} value='Tools'>
           Tools
         </option>

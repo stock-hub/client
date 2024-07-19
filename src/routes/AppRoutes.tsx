@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { DashboardPage } from '../pages/dashboard/DashboardPage/DashboardPage'
 import { AuthContext } from '../context/auth.context'
 import { LoginPage } from '../pages/dashboard/LoginPage/LoginPage'
@@ -10,9 +10,10 @@ import { HomePage } from '../pages/HomePage/HomePage'
 import { PageNotFound } from '../pages/PageNotFound/PageNotFound'
 import { InvoicesPage } from '../pages/dashboard/InvoicesPage/InvoicesPage'
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner'
+import PrivateRoute from '../components/PrivateRoute/PrivateRoute'
 
 export const AppRoutes: React.FC = () => {
-  const { isLoggedIn, isLoading } = useContext(AuthContext)
+  const { isLoading } = useContext(AuthContext)
 
   if (isLoading) {
     return <LoadingSpinner />
@@ -22,20 +23,26 @@ export const AppRoutes: React.FC = () => {
     <Routes>
       <Route path='/' element={<HomePage />} />
       <Route path='/dashboard/login' element={<LoginPage />} />
-      {isLoggedIn ? (
-        <>
-          <Route path='/dashboard' element={<DashboardPage />} />
-          <Route path='/dashboard/products' element={<ProductsPage />} />
-          <Route path='/dashboard/products/new' element={<NewProductPage />} />
-          <Route
-            path='/dashboard/products/:productId'
-            element={<ViewProductPage />}
-          />
-          <Route path='/dashboard/invoices' element={<InvoicesPage />} />
-        </>
-      ) : (
-        <Route path='*' element={<Navigate to='/dashboard/login' />} />
-      )}
+      <Route
+        path='/dashboard'
+        element={<PrivateRoute element={<DashboardPage />} />}
+      />
+      <Route
+        path='/dashboard/products'
+        element={<PrivateRoute element={<ProductsPage />} />}
+      />
+      <Route
+        path='/dashboard/products/new'
+        element={<PrivateRoute element={<NewProductPage />} />}
+      />
+      <Route
+        path='/dashboard/products/:productId'
+        element={<PrivateRoute element={<ViewProductPage />} />}
+      />
+      <Route
+        path='/dashboard/invoices'
+        element={<PrivateRoute element={<InvoicesPage />} />}
+      />
       <Route path='*' element={<PageNotFound />} />
     </Routes>
   )

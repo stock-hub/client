@@ -1,57 +1,51 @@
 import { useContext, useState } from 'react'
 import { AuthContext } from '../../../context/auth.context'
-import { useNavigate } from 'react-router-dom'
-import authService from '../../../services/auth.service'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Button, Form } from 'react-bootstrap'
 
-interface ILoginForm {
+interface LoginFormFields {
   username: string
   password: string
 }
 
-interface ILoginResponse {
-  data: {
-    authToken: string
-  }
-}
-
 export const LoginForm: React.FC = () => {
-  const [loginForm, setLoginForm] = useState<ILoginForm>({
+  const [loginFormFields, setLoginFormFields] = useState<LoginFormFields>({
     username: '',
     password: ''
   })
 
   const navigate = useNavigate()
-  const { storeToken, authenticateUser } = useContext(AuthContext)
+  const location = useLocation()
+  const { logInUser } = useContext(AuthContext)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setLoginForm({
-      ...loginForm,
+    setLoginFormFields({
+      ...loginFormFields,
       [name]: value
     })
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    authService
-      .login(loginForm)
-      .then((res: ILoginResponse) => {
-        const { authToken } = res.data
+    await logInUser(loginFormFields.username, loginFormFields.password)
 
-        storeToken(authToken)
-        authenticateUser()
-        navigate('/dashboard')
-      })
-      .catch((err: Error) => console.error(err))
+    const from = location.state?.from?.pathname || '/dashboard'
+    navigate(from, { replace: true })
   }
 
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className='mb-3' controlId='formBasicEmail'>
         <Form.Label>Username</Form.Label>
-        <Form.Control type='text' name='username' value={loginForm.username} onChange={handleInputChange} required />
+        <Form.Control
+          type='text'
+          name='username'
+          value={loginFormFields.username}
+          onChange={handleInputChange}
+          required
+        />
       </Form.Group>
 
       <Form.Group className='mb-3' controlId='formBasicPassword'>
@@ -59,7 +53,7 @@ export const LoginForm: React.FC = () => {
         <Form.Control
           type='password'
           name='password'
-          value={loginForm.password}
+          value={loginFormFields.password}
           onChange={handleInputChange}
           required
         />

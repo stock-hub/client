@@ -28,7 +28,7 @@ export const ViewProductPage: React.FC = () => {
     productService
       .getProduct(productId as string)
       .then(({ data }: { data: Product }) => setProduct(data))
-      .catch((err: Error) => console.log(err))
+      .catch((err: Error) => console.error(err))
   }, [productId])
 
   return (

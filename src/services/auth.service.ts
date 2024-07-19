@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-interface ILoginPayload {
+interface LoginPayload {
   username: string
   password: string
 }
@@ -23,12 +23,18 @@ class AuthService {
     })
   }
 
-  login(payload: ILoginPayload) {
+  login(payload: LoginPayload) {
     return this.axios.post('/login', payload)
   }
 
   verify(token: string) {
     return this.axios.get('/verify', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  }
+
+  getUser(token: string) {
+    return this.axios.get('/user', {
       headers: { Authorization: `Bearer ${token}` }
     })
   }
