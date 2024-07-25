@@ -92,10 +92,7 @@ export const NewProductForm: React.FC = () => {
           ...product,
           tags: [...product.tags, options[i].value]
         })
-      } else if (
-        options[i].selected &&
-        product.tags.includes(options[i].value)
-      ) {
+      } else if (options[i].selected && product.tags.includes(options[i].value)) {
         const tagIndex = product.tags.indexOf(options[i].value)
 
         if (tagIndex > -1) {
@@ -121,8 +118,8 @@ export const NewProductForm: React.FC = () => {
 
     cloudImagesService
       .uploadImage(uploadData)
-      .then(({ data }: { data: { cloudinaryUrls: Array<string> } }) => {
-        const newImages = [...product.imageUrl, ...data.cloudinaryUrls]
+      .then(({ data }: { data: { cloudinary_urls: Array<string> } }) => {
+        const newImages = [...product.imageUrl, ...data.cloudinary_urls]
         setLoadingImage(false)
         setProduct({
           ...product,
@@ -139,9 +136,7 @@ export const NewProductForm: React.FC = () => {
       })
   }
 
-  const removeSelectAttr = (
-    e: React.MouseEvent<HTMLOptionElement, MouseEvent>
-  ) => {
+  const removeSelectAttr = (e: React.MouseEvent<HTMLOptionElement, MouseEvent>) => {
     const el = (e.target as Element).parentNode as HTMLSelectElement
 
     setTimeout(() => {
@@ -149,7 +144,7 @@ export const NewProductForm: React.FC = () => {
     }, 90)
   }
 
-  const deleteImages = (url: string) => {
+  const deleteImage = (url: string) => {
     cloudImagesService.deleteImage(url).then(() => {
       const images = product.imageUrl
       const imageIndex = images.indexOf(url)
@@ -163,6 +158,12 @@ export const NewProductForm: React.FC = () => {
         imageUrl: images
       })
     })
+  }
+
+  const deleteImages = () => {
+    product.imageUrl.forEach((imgUrl) => cloudImagesService.deleteImage(imgUrl))
+
+    navigate(-1)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -179,59 +180,49 @@ export const NewProductForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group className='mb-3' controlId='formBasicEmail'>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Name</Form.Label>
         <Form.Control
-          type='text'
-          placeholder='Product name'
+          type="text"
+          placeholder="Product name"
           required
-          name='name'
+          name="name"
           value={product.name}
           onChange={handleInputChange}
         />
       </Form.Group>
-      <Form.Group className='mb-3' controlId='formBasicEmail'>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Description</Form.Label>
         <Form.Control
-          type='text'
-          placeholder='Product description'
+          type="text"
+          placeholder="Product description"
           required
-          name='description'
+          name="description"
           value={product.description}
           onChange={handleInputChange}
         />
       </Form.Group>
-      <Form.Group className='mb-3' controlId='formBasicEmail'>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Price</Form.Label>
         <Form.Control
-          type='number'
-          placeholder='Product price'
+          type="number"
+          placeholder="Product price"
           required
-          name='price'
+          name="price"
           value={product.price}
           onChange={handleInputChange}
         />
       </Form.Group>
-      <Form.Group controlId='formFileMultiple' className='mb-3'>
+      <Form.Group controlId="formFileMultiple" className="mb-3">
         <Form.Label>Choose image files</Form.Label>
-        <Form.Control
-          type='file'
-          multiple
-          required
-          name='imageUrl'
-          onChange={uploadProductImages}
-        />
+        <Form.Control type="file" multiple required name="imageUrl" onChange={uploadProductImages} />
       </Form.Group>
       <ImagesPreview>
         {product.imageUrl?.map((image, idx) => {
           return (
             <div key={idx}>
-              <DeleteImageBtn
-                type='button'
-                onClick={() => deleteImages(image)}
-                className={`image-${idx}`}
-              >
-                <i className='fa-solid fa-xmark'></i>
+              <DeleteImageBtn type="button" onClick={() => deleteImage(image)} className={`image-${idx}`}>
+                <i className="fa-solid fa-xmark"></i>
               </DeleteImageBtn>
               <PicturePreview className={`preview preview-${idx + 1}`}>
                 <img src={image} alt={`preview-${idx + 1}`} />
@@ -241,26 +232,21 @@ export const NewProductForm: React.FC = () => {
         })}
       </ImagesPreview>
       <Form.Check
-        type='switch'
-        id='custom-switch'
-        label='Product on sell?'
-        name='onSell'
+        type="switch"
+        id="custom-switch"
+        label="Product on sell?"
+        name="onSell"
         onChange={handleInputChange}
       />
       <h6>Choose tag:</h6>
-      <Form.Select
-        aria-label='Default select example'
-        name='tags'
-        multiple
-        onChange={handleSelect}
-      >
-        <option onClick={removeSelectAttr} value='Tools'>
+      <Form.Select aria-label="Default select example" name="tags" multiple onChange={handleSelect}>
+        <option onClick={removeSelectAttr} value="Tools">
           Tools
         </option>
-        <option onClick={removeSelectAttr} value='Machinery'>
+        <option onClick={removeSelectAttr} value="Machinery">
           Machinery
         </option>
-        <option onClick={removeSelectAttr} value='Materials'>
+        <option onClick={removeSelectAttr} value="Materials">
           Materials
         </option>
       </Form.Select>
@@ -271,10 +257,10 @@ export const NewProductForm: React.FC = () => {
           <NewProductTag key={idx}>{el}</NewProductTag>
         ))}
       </p>
-      <Button variant='primary' type='submit' disabled={loadingImage}>
+      <Button variant="primary" type="submit" disabled={loadingImage}>
         {loadingImage ? 'Wait...' : 'Send'}
       </Button>
-      <Button variant='danger' type='button' onClick={() => navigate(-1)}>
+      <Button variant="danger" type="button" onClick={deleteImages}>
         Cancel
       </Button>
     </Form>

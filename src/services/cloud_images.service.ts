@@ -4,12 +4,11 @@ class CloudImagesService {
   axios: any
   constructor() {
     this.axios = axios.create({
-      baseURL: `${import.meta.env.VITE_API_URL}`
+      baseURL: `${import.meta.env.VITE_API_URL}/images`
     })
 
     this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
-      const storedToken =
-        localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+      const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
         config.headers = { Authorization: `Bearer ${storedToken}` }
@@ -24,9 +23,7 @@ class CloudImagesService {
   }
 
   deleteImage(image_url: string) {
-    return this.axios.post(
-      `/delete_image/&url=${encodeURIComponent(image_url)}`
-    )
+    return this.axios.post(`/delete_image/&url=${encodeURIComponent(image_url)}`)
   }
 }
 

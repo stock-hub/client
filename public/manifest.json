@@ -1,6 +1,7 @@
 {
   "short_name": "StockHub",
-  "name": "Stock Hub",
+  "name": "StockHub - Inventory Management",
+  "description": "StockHub is a comprehensive inventory management system for tracking and managing stock levels, orders, and sales.",
   "icons": [
     {
       "src": "favicon.ico",
