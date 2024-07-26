@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Container } from 'react-bootstrap'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Product } from '../../../types/product.type'
 import productService from '../../../services/products.service'
 import { ViewProductImgs } from '../../../components/dashboard/ViewProductImgs/ViewProductImgs'
@@ -19,7 +19,8 @@ export const ViewProductPage: React.FC = () => {
     price: '',
     imageUrl: [],
     tags: [],
-    onSell: ''
+    onSell: '',
+    inStock: ''
   })
   const { productId } = useParams<RouteParams>()
   const onSell = product.onSell ? 'Producto en venta' : ''
@@ -35,7 +36,7 @@ export const ViewProductPage: React.FC = () => {
     <>
       <Container>
         <br />
-        <Button variant='outline-primary' onClick={() => navigate(-1)}>
+        <Button variant="outline-primary" onClick={() => navigate(-1)}>
           Volver
         </Button>
         <br />
@@ -45,9 +46,9 @@ export const ViewProductPage: React.FC = () => {
         <p>${product.price}</p>
         <p>{onSell}</p>
         <p>{product.description}</p>
-        <Button variant='outline-danger' onClick={() => navigate(-1)}>
-          Go back
-        </Button>
+        <Link className="btn btn-outline-info" to={`/dashboard/products/${product._id}/edit`}>
+          Editar
+        </Link>
       </Container>
       <br />
       <br />

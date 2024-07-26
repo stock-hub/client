@@ -6,6 +6,20 @@ export interface Product {
   imageUrl: Array<string>
   tags: Array<string>
   onSell: string
+  inStock: string
+  user?: {
+    _id?: string
+    username: string
+    password: string
+    logoUrl: string
+    companyName: string
+    phone: number
+    address: string
+    nif: string
+    tags: string[]
+    createdAt: Date
+    updatedAt: Date
+  }
 }
 
 export interface ProductContextProps {

@@ -10,8 +10,7 @@ class ProductService {
     })
 
     this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
-      const storedToken =
-        localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+      const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
         config.headers = { Authorization: `Bearer ${storedToken}` }
@@ -35,6 +34,10 @@ class ProductService {
 
   newProduct(product: Product) {
     return this.axios.post('/new', product)
+  }
+
+  editProduct(productId: string, product: Product) {
+    return this.axios.put(`/${productId}/edit`, product)
   }
 
   deleteProduct(productId: string) {

@@ -33,34 +33,34 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <EachProductDiv>
       <Row>
-        <Col md='2'>
+        <Col md="2">
           <ProductImg src={product.imageUrl[0]} alt={product.name} />
         </Col>
-        <Col md='8'>
+        <Col md="8">
           <p>
             <strong>{product.name}</strong>
           </p>
           <p>${product.price}</p>
           {product.tags.map((tag, idx) => {
             return (
-              <p key={idx} className='AdminProductTag'>
+              <p key={idx} className="AdminProductTag">
                 {tag}
               </p>
             )
           })}
         </Col>
-        <Col md='2' className='eachProductButtons'>
-          <Link className='btn btn-outline-info' to={`/dashboard/products/${product._id}`}>
-            Open
+        <Col md="2" className="eachProductButtons">
+          <Link className="btn btn-outline-info" to={`/dashboard/products/${product._id}`}>
+            Abrir
           </Link>{' '}
           <Button
-            variant='outline-danger'
+            variant="outline-danger"
             onClick={() => {
               deleteProduct(product._id!)
               navigate(0)
             }}
           >
-            Delete
+            Borrar
           </Button>
         </Col>
       </Row>

@@ -1,17 +1,7 @@
-export {}
-/* eslint-disable no-extend-native */
-// Prototypes
-declare global {
-  interface String {
-    titleize(): string
-    formatStr(): string
-  }
+export function titleize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-String.prototype.titleize = function (): string {
-  return this.charAt(0).toUpperCase() + this.slice(1)
-}
-
-String.prototype.formatStr = function (): string {
-  return this.split('_').join(' ')
+export function formatStr(str: string): string {
+  return str.split('_').join(' ')
 }

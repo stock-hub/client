@@ -1,58 +1,15 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import productService from '../../../services/products.service'
 import cloudImagesService from '../../../services/cloud_images.service'
 import { MessageContext } from '../../../context/userMessage.context'
 import { Product } from '../../../types/product.type'
-import styled from 'styled-components'
+import { titleize } from '../../../utils/tools'
+import { DeleteImageBtn, ImagesPreview, NewProductTag, PicturePreview } from './EditProductForm.styled'
 
-const NewProductTag = styled.span`
-  background-color: #d3d0d0;
-  padding: 3px 3px;
-  border-radius: 5px;
-  margin-right: 5px;
-`
-
-const ImagesPreview = styled.div`
-  display: flex;
-  justify-content: space-around;
-  margin: 2rem 0;
-
-  & > div {
-    padding: 10px;
-  }
-`
-
-const PicturePreview = styled.picture`
-  & img {
-    width: 10rem;
-    height: 10rem;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-`
-
-const DeleteImageBtn = styled.button`
-  background: none;
-  border: 2px solid red;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  color: red;
-  font-size: 1.5rem;
-  position: absolute;
-
-  & i {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: 5px;
-  }
-`
-
-export const NewProductForm: React.FC = () => {
-  const [product, setProduct] = useState<Product>({
+export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { product: Product }) => {
+  const [updatedProduct, setUpdatedProduct] = useState<Product>({
     name: '',
     description: '',
     price: '',
@@ -62,22 +19,36 @@ export const NewProductForm: React.FC = () => {
     tags: []
   })
 
+  useEffect(() => {
+    if (product) {
+      setUpdatedProduct(product)
+    }
+  }, [product])
+
   const [loadingImage, setLoadingImage] = useState(false)
+  const [newUploadedImgs, setNewUploadedImgs] = useState<string[]>([])
+  const [removedImgs, setRemovedImgs] = useState<string[]>([])
   const { setShowMessage, setMessageInfo } = useContext(MessageContext)
+  const maxImagesReached = updatedProduct.imageUrl.length >= 5
+  const productHasImages = Boolean(updatedProduct.imageUrl.length)
 
   const navigate = useNavigate()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target
     if (name === 'onSell') {
-      setProduct({
-        ...product,
-        onSell: checked ? 'on' : 'off',
+      setUpdatedProduct({
+        ...updatedProduct,
+        onSell: checked ? 'on' : 'off'
+      })
+    } else if (name === 'inStock') {
+      setUpdatedProduct({
+        ...updatedProduct,
         inStock: checked ? 'on' : 'off'
       })
     } else {
-      setProduct({
-        ...product,
+      setUpdatedProduct({
+        ...updatedProduct,
         [name]: value
       })
     }
@@ -89,27 +60,27 @@ export const NewProductForm: React.FC = () => {
     const options = e.target.options
 
     for (let i = 0; i < options.length; i++) {
-      if (options[i].selected && !product.tags.includes(options[i].value)) {
-        setProduct({
-          ...product,
-          tags: [...product.tags, options[i].value]
+      if (options[i].selected && !updatedProduct.tags.includes(options[i].value)) {
+        setUpdatedProduct({
+          ...updatedProduct,
+          tags: [...updatedProduct.tags, options[i].value]
         })
-      } else if (options[i].selected && product.tags.includes(options[i].value)) {
-        const tagIndex = product.tags.indexOf(options[i].value)
+      } else if (options[i].selected && updatedProduct.tags.includes(options[i].value)) {
+        const tagIndex = updatedProduct.tags.indexOf(options[i].value)
 
         if (tagIndex > -1) {
-          product.tags.splice(tagIndex, 1)
+          updatedProduct.tags.splice(tagIndex, 1)
 
-          setProduct({
-            ...product,
-            tags: product.tags
+          setUpdatedProduct({
+            ...updatedProduct,
+            tags: updatedProduct.tags
           })
         }
       }
     }
   }
 
-  const uploadProductImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadProductImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoadingImage(true)
 
     const uploadData = new FormData()
@@ -118,24 +89,26 @@ export const NewProductForm: React.FC = () => {
       uploadData.append('imageUrl', e.target.files![i])
     }
 
-    cloudImagesService
-      .uploadImage(uploadData)
-      .then(({ data }: { data: { cloudinary_urls: Array<string> } }) => {
-        const newImages = [...product.imageUrl, ...data.cloudinary_urls]
+    try {
+      const { data } = await cloudImagesService.uploadImage(uploadData)
+      const newImages = [...updatedProduct.imageUrl, ...data.cloudinary_urls]
+      const imgDiff = newImages.filter((x) => !updatedProduct.imageUrl.includes(x))
+
+      setUpdatedProduct({
+        ...updatedProduct,
+        imageUrl: newImages
+      })
+      setNewUploadedImgs(imgDiff)
+
+      setLoadingImage(false)
+    } catch (err) {
+      console.error(err)
+      if (updatedProduct.imageUrl.length > 0) {
         setLoadingImage(false)
-        setProduct({
-          ...product,
-          imageUrl: newImages
-        })
-      })
-      .catch((err: Error) => {
-        console.error(err)
-        if (product.imageUrl.length > 0) {
-          setLoadingImage(false)
-        }
-        setShowMessage(true)
-        setMessageInfo('You must select at least one image.')
-      })
+      }
+      setShowMessage(true)
+      setMessageInfo('You must select at least one image.')
+    }
   }
 
   const removeSelectAttr = (e: React.MouseEvent<HTMLOptionElement, MouseEvent>) => {
@@ -146,24 +119,28 @@ export const NewProductForm: React.FC = () => {
     }, 90)
   }
 
-  const deleteImage = (url: string) => {
-    cloudImagesService.deleteImage(url).then(() => {
-      const images = product.imageUrl
-      const imageIndex = images.indexOf(url)
+  const removeImage = (url: string) => {
+    const images = updatedProduct.imageUrl
+    const imageIndex = images.indexOf(url)
 
-      if (imageIndex > -1) {
-        images.splice(imageIndex, 1)
-      }
+    if (imageIndex > -1) {
+      images.splice(imageIndex, 1)
+    }
 
-      setProduct({
-        ...product,
-        imageUrl: images
-      })
+    setRemovedImgs([...removedImgs, url])
+
+    setUpdatedProduct({
+      ...updatedProduct,
+      imageUrl: images
     })
   }
 
+  const deleteRemovedImages = () => {
+    removedImgs.forEach((imgUrl) => cloudImagesService.deleteImage(imgUrl))
+  }
+
   const deleteImages = () => {
-    product.imageUrl.forEach((imgUrl) => cloudImagesService.deleteImage(imgUrl))
+    newUploadedImgs.forEach((imgUrl) => cloudImagesService.deleteImage(imgUrl))
 
     navigate(-1)
   }
@@ -172,8 +149,11 @@ export const NewProductForm: React.FC = () => {
     e.preventDefault()
 
     productService
-      .newProduct(product)
-      .then(() => navigate('/dashboard/products?page=1'))
+      .editProduct(product._id!, updatedProduct)
+      .then(() => {
+        deleteRemovedImages()
+        navigate(`/dashboard/products/${product._id}`)
+      })
       .catch((err: Error) => {
         setShowMessage(true)
         setMessageInfo(err.message)
@@ -216,18 +196,25 @@ export const NewProductForm: React.FC = () => {
         />
       </Form.Group>
       <Form.Group controlId="formFileMultiple" className="mb-3">
-        <Form.Label>Imagenes</Form.Label>
-        <Form.Control type="file" multiple required name="imageUrl" onChange={uploadProductImages} />
+        <Form.Label>Imagenes (5 max.)</Form.Label>
+        <Form.Control
+          type="file"
+          multiple
+          required={!productHasImages}
+          name="imageUrl"
+          onChange={uploadProductImages}
+          disabled={maxImagesReached}
+        />
       </Form.Group>
       <ImagesPreview>
-        {product.imageUrl?.map((image, idx) => {
+        {updatedProduct.imageUrl.map((url, idx) => {
           return (
             <div key={idx}>
-              <DeleteImageBtn type="button" onClick={() => deleteImage(image)} className={`image-${idx}`}>
+              <DeleteImageBtn type="button" onClick={() => removeImage(url)} className={`image-${idx}`}>
                 <i className="fa-solid fa-xmark"></i>
               </DeleteImageBtn>
               <PicturePreview className={`preview preview-${idx + 1}`}>
-                <img src={image} alt={`preview-${idx + 1}`} />
+                <img src={url} alt={`preview-${idx + 1}`} />
               </PicturePreview>
             </div>
           )
@@ -249,25 +236,23 @@ export const NewProductForm: React.FC = () => {
       />
       <h6>Elegir etiquetas:</h6>
       <Form.Select aria-label="Default select example" name="tags" multiple onChange={handleSelect}>
-        <option onClick={removeSelectAttr} value="Tools">
-          Herramientas
-        </option>
-        <option onClick={removeSelectAttr} value="Machinery">
-          Maquinaria
-        </option>
-        <option onClick={removeSelectAttr} value="Materials">
-          Materiales
-        </option>
+        {product.user?.tags.map((tag: string, idx: number) => {
+          return (
+            <option key={idx} onClick={removeSelectAttr} value={tag}>
+              {titleize(tag)}
+            </option>
+          )
+        })}
       </Form.Select>
       <br />
       <p>
         Etiquetas seleccionadas:{' '}
-        {product.tags.map((el, idx) => (
+        {updatedProduct.tags.map((el, idx) => (
           <NewProductTag key={idx}>{el}</NewProductTag>
         ))}
       </p>
       <Button variant="primary" type="submit" disabled={loadingImage}>
-        {loadingImage ? 'Espere...' : 'Crear'}
+        {loadingImage ? 'Espere...' : 'Actualizar'}
       </Button>
       <Button variant="danger" type="button" onClick={deleteImages}>
         Cancelar

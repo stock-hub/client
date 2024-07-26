@@ -11,19 +11,19 @@ export const NavBar: React.FC = () => {
   }
 
   return (
-    <Navbar bg='light' expand='lg'>
+    <Navbar bg="light" expand="lg">
       <Container fluid>
         <Navbar.Brand>StockHub</Navbar.Brand>
-        <Navbar.Toggle aria-controls='navbarScroll' />
-        <Navbar.Collapse id='navbarScroll'>
-          <Nav className='me-auto my-2 my-lg-0' style={{ maxHeight: '100px' }} navbarScroll>
-            <Nav.Link href='/'>Home</Nav.Link>
+        <Navbar.Toggle aria-controls="navbarScroll" />
+        <Navbar.Collapse id="navbarScroll">
+          <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
+            <Nav.Link href="/">Inicio</Nav.Link>
             {isLoggedIn && (
               <>
-                <NavDropdown title='Dashboard' id='basic-nav-dropdown'>
-                  <NavDropdown.Item href='/dashboard'>Statistics</NavDropdown.Item>
-                  <NavDropdown.Item href='/dashboard/products?page=1'>Products</NavDropdown.Item>
-                  <NavDropdown.Item href='/dashboard/invoices'>Invoices</NavDropdown.Item>
+                <NavDropdown title="Dashboard" id="basic-nav-dropdown">
+                  <NavDropdown.Item href="/dashboard">Estadísticas</NavDropdown.Item>
+                  <NavDropdown.Item href="/dashboard/products?page=1">Productos</NavDropdown.Item>
+                  <NavDropdown.Item href="/dashboard/invoices">Facturas</NavDropdown.Item>
                 </NavDropdown>
               </>
             )}
@@ -31,7 +31,7 @@ export const NavBar: React.FC = () => {
           <div>
             {isLoggedIn && (
               <Button
-                variant='outline-danger'
+                variant="outline-danger"
                 onClick={() => {
                   logOutUser()
                   navigation()

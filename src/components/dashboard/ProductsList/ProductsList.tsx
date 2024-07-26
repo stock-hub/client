@@ -27,8 +27,7 @@ const ProductsFilter = styled.div`
 
 export const ProductsList: React.FC = () => {
   const [pageParams, setPageParams] = useSearchParams()
-  const { productsList, changePage, totalPages, setProductsList, getProducts } =
-    useContext(ProductContext)
+  const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
   const [query, setQuery] = useState<string>('')
   const [buttonSearch, setButtonSearch] = useState<string>('')
   const pageNumber: number | string = Number(pageParams.get('page')) || 1
@@ -94,17 +93,17 @@ export const ProductsList: React.FC = () => {
     <>
       <ProductsFilter>
         <ProductInputFilter
-          className='form-control'
-          type='text'
-          placeholder='Buscar producto'
+          className="form-control"
+          type="text"
+          placeholder="Buscar producto"
           onChange={handleInputChange}
           value={query}
         />
-        <button className='btn btn-outline-primary' onClick={setSearchQuery}>
-          Search
+        <button className="btn btn-outline-primary" onClick={setSearchQuery}>
+          Buscar
         </button>
-        <button className='btn btn-outline-primary' onClick={resetFilter}>
-          Clear filters
+        <button className="btn btn-outline-primary" onClick={resetFilter}>
+          Limpiar filtros
         </button>
       </ProductsFilter>
       {productsList.length !== 0 ? (
@@ -114,24 +113,24 @@ export const ProductsList: React.FC = () => {
           })}
           <br />
           <ProductPaginator>
-            <ButtonGroup aria-label='Basic example'>
-              <Button variant='outline-primary' onClick={firstPage}>
+            <ButtonGroup aria-label="Basic example">
+              <Button variant="outline-primary" onClick={firstPage}>
                 {'<<'}
               </Button>
-              <Button variant='outline-primary' onClick={prevPage}>
+              <Button variant="outline-primary" onClick={prevPage}>
                 {'<'}
               </Button>
-              <Button variant='outline-primary' onClick={nextPage}>
+              <Button variant="outline-primary" onClick={nextPage}>
                 {'>'}
               </Button>
-              <Button variant='outline-primary' onClick={lastPage}>
+              <Button variant="outline-primary" onClick={lastPage}>
                 {'>>'}
               </Button>
             </ButtonGroup>
           </ProductPaginator>
         </>
       ) : (
-        <Spinner animation='border' variant='info' />
+        <Spinner animation="border" variant="info" />
       )}
     </>
   )
