@@ -46,7 +46,7 @@ export const ViewProductImgs: React.FC<Props> = ({ imgs }) => {
       </button>
     </Carousel>
   ) : (
-    <Gallery imgCount={imgCount}>
+    <Gallery $imgCount={imgCount}>
       {imgs === undefined ? (
         <div className="loading-image">
           <img src={loadingImage} alt="loading_image" />

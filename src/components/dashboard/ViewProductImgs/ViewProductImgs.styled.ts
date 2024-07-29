@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const Gallery = styled.div<{ imgCount: number }>`
+export const Gallery = styled.div<{ $imgCount: number }>`
   display: grid;
   grid-gap: 5px;
   grid-template-columns: 10;
@@ -14,8 +14,8 @@ export const Gallery = styled.div<{ imgCount: number }>`
     object-fit: cover;
   }
 
-  ${({ imgCount }) =>
-    imgCount === 1 &&
+  ${({ $imgCount }) =>
+    $imgCount === 1 &&
     `
 
 & .gallery__item--1 {
@@ -45,8 +45,8 @@ export const Gallery = styled.div<{ imgCount: number }>`
 }
 `}
 
-  ${({ imgCount }) =>
-    imgCount === 2 &&
+  ${({ $imgCount }) =>
+    $imgCount === 2 &&
     `
 
 & .gallery__item--1 {
@@ -83,8 +83,8 @@ export const Gallery = styled.div<{ imgCount: number }>`
 }
 `}
 
-  ${({ imgCount }) =>
-    imgCount === 3 &&
+  ${({ $imgCount }) =>
+    $imgCount === 3 &&
     `
 
 & .gallery__item--1 {
@@ -127,8 +127,8 @@ export const Gallery = styled.div<{ imgCount: number }>`
 }
 `}
 
-  ${({ imgCount }) =>
-    imgCount > 3 &&
+  ${({ $imgCount }) =>
+    $imgCount > 3 &&
     `
 
 & .gallery__item--1 {
