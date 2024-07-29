@@ -1,9 +1,8 @@
-import { useContext } from 'react'
 import { Button, Col, Row } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
-import { ProductContext } from '../../../context/product.context'
 import { Product } from '../../../types/product.type'
 import styled from 'styled-components'
+import productService from '../../../services/products.service'
 
 const EachProductDiv = styled.div`
   @media screen and (max-width: 480px) {
@@ -27,8 +26,14 @@ const ProductImg = styled.img`
 `
 
 const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
-  const { deleteProduct } = useContext(ProductContext)
   const navigate = useNavigate()
+
+  const deleteProduct = (productId: string) => {
+    productService
+      .deleteProduct(productId)
+      .then(() => navigate(0))
+      .catch((err: Error) => console.error(err))
+  }
 
   return (
     <EachProductDiv>
@@ -57,7 +62,6 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
             variant="outline-danger"
             onClick={() => {
               deleteProduct(product._id!)
-              navigate(0)
             }}
           >
             Borrar

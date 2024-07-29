@@ -1,8 +1,7 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Spinner, Button, ButtonGroup } from 'react-bootstrap'
 import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
-import { ProductContext } from '../../../context/product.context'
 import productService from '../../../services/products.service'
 import { Product } from '../../../types/product.type'
 import styled from 'styled-components'
@@ -25,9 +24,16 @@ const ProductsFilter = styled.div`
   }
 `
 
+interface IProductResponse {
+  products: Product[]
+  total_pages: number
+}
+
 export const ProductsList: React.FC = () => {
   const [pageParams, setPageParams] = useSearchParams()
-  const { productsList, changePage, totalPages, setProductsList, getProducts } = useContext(ProductContext)
+  const [productsList, setProductsList] = useState<Product[]>([])
+  const [page, setPage] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1)
   const [query, setQuery] = useState<string>('')
   const [buttonSearch, setButtonSearch] = useState<string>('')
   const pageNumber: number | string = Number(pageParams.get('page')) || 1
@@ -55,6 +61,22 @@ export const ProductsList: React.FC = () => {
     setPageParams({ page: totalPages.toString() })
     window.scrollTo(0, 0)
   }
+
+  const getProducts = useCallback(() => {
+    productService
+      .getProductsList(page)
+      .then(({ data }: { data: IProductResponse }) => {
+        setProductsList(data.products)
+        setTotalPages(data.total_pages)
+      })
+      .catch((err: Error) => console.error(err))
+  }, [page])
+
+  useEffect(() => {
+    getProducts()
+  }, [page])
+
+  const changePage = (num: number) => setPage(num)
 
   const getFilteredProducts = useCallback(() => {
     if (buttonSearch !== '') {
