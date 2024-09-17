@@ -69,11 +69,10 @@ export const NewProductForm: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target
-    if (name === 'onSell') {
+    if (['onSell', 'inStock'].includes(name)) {
       setProduct({
         ...product,
-        onSell: checked ? 'on' : 'off',
-        inStock: checked ? 'on' : 'off'
+        [name]: checked ? 'on' : 'off'
       })
     } else {
       setProduct({

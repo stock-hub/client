@@ -1,28 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Spinner, Button, ButtonGroup } from 'react-bootstrap'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { Button, ButtonGroup } from 'react-bootstrap'
 import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
 import productService from '../../../services/products.service'
 import { Product } from '../../../types/product.type'
-import styled from 'styled-components'
-
-const ProductPaginator = styled.div`
-  text-align: center;
-  margin-bottom: 1rem;
-`
-
-const ProductInputFilter = styled.input`
-  width: 20%;
-  display: inline-block;
-`
-
-const ProductsFilter = styled.div`
-  margin-bottom: 2rem;
-
-  & button {
-    margin-left: 1rem;
-  }
-`
+import {
+  Container,
+  FormCheck,
+  ProductInputFilter,
+  ProductPaginator,
+  ProductsFilter,
+  ProductsListDiv
+} from './ProductsList.styled'
+import { AuthContext } from '../../../context/auth.context'
+import { titleize } from '../../../utils/tools'
 
 interface IProductResponse {
   products: Product[]
@@ -30,130 +21,132 @@ interface IProductResponse {
 }
 
 export const ProductsList: React.FC = () => {
-  const [pageParams, setPageParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [productsList, setProductsList] = useState<Product[]>([])
-  const [page, setPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
-  const [query, setQuery] = useState<string>('')
-  const [buttonSearch, setButtonSearch] = useState<string>('')
-  const pageNumber: number | string = Number(pageParams.get('page')) || 1
+  const [query, setQuery] = useState<string>(searchParams.get('query') || '')
+  const [queryTags, setQueryTags] = useState<string>(searchParams.get('tags') || '')
+  const [filterTrigger, setFilterTrigger] = useState<boolean>(false)
+  const [checkedTags, setCheckedTags] = useState<{ [key: string]: boolean }>({})
+  const page = Number(searchParams.get('page')) || 1
+  const { user } = useContext(AuthContext)
 
-  const firstPage = () => {
-    setPageParams({ page: '1' })
-    window.scrollTo(0, 0)
-  }
-
-  const prevPage = () => {
-    if (pageNumber > 1) {
-      setPageParams({ page: (pageNumber - 1).toString() })
-      window.scrollTo(0, 0)
-    }
-  }
-
-  const nextPage = () => {
-    if (pageNumber < totalPages) {
-      setPageParams({ page: (pageNumber + 1).toString() })
-      window.scrollTo(0, 0)
-    }
-  }
-
-  const lastPage = () => {
-    setPageParams({ page: totalPages.toString() })
-    window.scrollTo(0, 0)
-  }
-
-  const getProducts = useCallback(() => {
+  const fetchProducts = useCallback((page: number, query: string, tags: string) => {
     productService
-      .getProductsList(page)
+      .getProductsList(page, query, tags.split(' ').join(','))
       .then(({ data }: { data: IProductResponse }) => {
         setProductsList(data.products)
         setTotalPages(data.total_pages)
       })
       .catch((err: Error) => console.error(err))
-  }, [page])
+  }, [])
 
   useEffect(() => {
-    getProducts()
-  }, [page])
+    fetchProducts(page, query, queryTags)
+  }, [fetchProducts, page, filterTrigger])
 
-  const changePage = (num: number) => setPage(num)
-
-  const getFilteredProducts = useCallback(() => {
-    if (buttonSearch !== '') {
-      productService
-        .getAllProducts(buttonSearch)
-        .then(({ data }: { data: Product[] }) => {
-          setProductsList(data)
-        })
-        .catch((err: Error) => console.error(err))
-    } else {
-      getProducts()
-    }
-  }, [buttonSearch, getProducts, setProductsList])
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ page: newPage.toString(), query })
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)
   }
 
-  const setSearchQuery = () => setButtonSearch(query)
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
 
-  const resetFilter = useCallback(() => {
+    let activeTags = queryTags.split(' ')
+
+    if (checked) {
+      activeTags.push(name)
+    } else {
+      activeTags = activeTags.filter((tag) => tag !== name)
+    }
+
+    setQueryTags(activeTags.join(' ').trim())
+    setCheckedTags((prevState) => ({
+      ...prevState,
+      [name]: checked
+    }))
+  }
+
+  const handleSearch = () => {
+    setFilterTrigger(!filterTrigger)
+    setSearchParams({ page: '1', query, tags: queryTags })
+  }
+
+  const resetFilter = () => {
     setQuery('')
-    setButtonSearch('')
-    getProducts()
-  }, [getProducts])
-
-  useEffect(() => {
-    changePage(pageNumber)
-  }, [changePage, pageNumber])
-
-  useEffect(() => {
-    getFilteredProducts()
-  }, [buttonSearch, getFilteredProducts])
+    setQueryTags('')
+    setCheckedTags({})
+    setSearchParams({ page: '1' })
+    setFilterTrigger(!filterTrigger)
+  }
 
   return (
     <>
-      <ProductsFilter>
-        <ProductInputFilter
-          className="form-control"
-          type="text"
-          placeholder="Buscar producto"
-          onChange={handleInputChange}
-          value={query}
-        />
-        <button className="btn btn-outline-primary" onClick={setSearchQuery}>
-          Buscar
-        </button>
-        <button className="btn btn-outline-primary" onClick={resetFilter}>
-          Limpiar filtros
-        </button>
-      </ProductsFilter>
-      {productsList.length !== 0 ? (
-        <>
-          {productsList.map((product, idx) => {
-            return <EachProduct key={idx} product={product} />
-          })}
-          <br />
-          <ProductPaginator>
-            <ButtonGroup aria-label="Basic example">
-              <Button variant="outline-primary" onClick={firstPage}>
-                {'<<'}
-              </Button>
-              <Button variant="outline-primary" onClick={prevPage}>
-                {'<'}
-              </Button>
-              <Button variant="outline-primary" onClick={nextPage}>
-                {'>'}
-              </Button>
-              <Button variant="outline-primary" onClick={lastPage}>
-                {'>>'}
-              </Button>
-            </ButtonGroup>
-          </ProductPaginator>
-        </>
-      ) : (
-        <Spinner animation="border" variant="info" />
-      )}
+      <Container>
+        <ProductsFilter>
+          <button className="btn btn-warning" onClick={resetFilter}>
+            Limpiar filtros
+          </button>
+          <ProductInputFilter
+            className="form-control"
+            type="text"
+            placeholder="Buscar producto"
+            onChange={handleInputChange}
+            value={query}
+          />
+          <button className="btn btn-outline-primary" onClick={handleSearch}>
+            Buscar
+          </button>
+          <div>
+            <p>Filtrar por etiqueta:</p>
+            <div>
+              <ul>
+                {user?.tags.map((tag, idx) => {
+                  return (
+                    <FormCheck
+                      type="switch"
+                      label={titleize(tag)}
+                      name={tag}
+                      key={idx}
+                      checked={checkedTags[tag] || false}
+                      onChange={handleCheckboxChange}
+                    />
+                  )
+                })}
+              </ul>
+            </div>
+          </div>
+        </ProductsFilter>
+        {productsList.length !== 0 ? (
+          <ProductsListDiv>
+            {productsList.map((product, idx) => (
+              <EachProduct key={idx} product={product} />
+            ))}
+          </ProductsListDiv>
+        ) : (
+          <p>La lista de productos está vacía</p>
+        )}
+      </Container>
+      <ProductPaginator>
+        <ButtonGroup aria-label="Basic example">
+          <Button variant="outline-primary" onClick={() => handlePageChange(1)}>
+            {'<<'}
+          </Button>
+          <Button variant="outline-primary" onClick={() => handlePageChange(page > 1 ? page - 1 : 1)}>
+            {'<'}
+          </Button>
+          <Button variant="outline-primary" onClick={() => handlePageChange(page < totalPages ? page + 1 : totalPages)}>
+            {'>'}
+          </Button>
+          <Button variant="outline-primary" onClick={() => handlePageChange(totalPages)}>
+            {'>>'}
+          </Button>
+        </ButtonGroup>
+      </ProductPaginator>
     </>
   )
 }

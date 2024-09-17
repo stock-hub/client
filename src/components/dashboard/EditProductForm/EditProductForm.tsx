@@ -36,15 +36,11 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target
-    if (name === 'onSell') {
+
+    if (['onSell', 'inStock'].includes(name)) {
       setUpdatedProduct({
         ...updatedProduct,
-        onSell: checked ? 'on' : 'off'
-      })
-    } else if (name === 'inStock') {
-      setUpdatedProduct({
-        ...updatedProduct,
-        inStock: checked ? 'on' : 'off'
+        [name]: checked ? 'on' : 'off'
       })
     } else {
       setUpdatedProduct({

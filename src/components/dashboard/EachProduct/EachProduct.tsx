@@ -1,29 +1,8 @@
 import { Button, Col, Row } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Product } from '../../../types/product.type'
-import styled from 'styled-components'
 import productService from '../../../services/products.service'
-
-const EachProductDiv = styled.div`
-  @media screen and (max-width: 480px) {
-    .eachAdminProduct {
-      text-align: center;
-    }
-
-    .eachAdminProduct a,
-    .eachAdminProduct button {
-      display: block;
-      width: 100%;
-      margin-bottom: 5px;
-    }
-  }
-`
-
-const ProductImg = styled.img`
-  height: 150px;
-  width: 150px;
-  object-fit: cover;
-`
+import { ActionLink, EachProductDiv, ProductImg } from './EachProduct.styled'
 
 const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
   const navigate = useNavigate()
@@ -54,10 +33,10 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
             )
           })}
         </Col>
-        <Col md="2" className="eachProductButtons">
-          <Link className="btn btn-outline-info" to={`/dashboard/products/${product._id}`}>
+        <Col md="2">
+          <ActionLink className="btn btn-outline-info" to={`/dashboard/products/${product._id}`}>
             Abrir
-          </Link>{' '}
+          </ActionLink>{' '}
           <Button
             variant="outline-danger"
             onClick={() => {

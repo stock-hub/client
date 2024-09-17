@@ -4,6 +4,7 @@ import authService from '../services/auth.service'
 interface User {
   username: string
   _id: string
+  tags: string[]
 }
 
 interface AuthContextType {
@@ -36,32 +37,22 @@ interface LoginResponse {
   }
 }
 
-export const AuthProviderWrapper = ({
-  children
-}: {
-  children: React.ReactNode
-}) => {
+export const AuthProviderWrapper = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [rememberUser, setRememberUser] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
 
   const storeToken = (token: string) => {
-    rememberUser
-      ? localStorage.setItem('authToken', token)
-      : sessionStorage.setItem('authToken', token)
+    rememberUser ? localStorage.setItem('authToken', token) : sessionStorage.setItem('authToken', token)
   }
 
   const removeToken = () => {
-    rememberUser
-      ? localStorage.removeItem('authToken')
-      : sessionStorage.removeItem('authToken')
+    rememberUser ? localStorage.removeItem('authToken') : sessionStorage.removeItem('authToken')
   }
 
   const getToken = (): string | null => {
-    return rememberUser
-      ? localStorage.getItem('authToken')
-      : sessionStorage.getItem('authToken')
+    return rememberUser ? localStorage.getItem('authToken') : sessionStorage.getItem('authToken')
   }
 
   const authenticateUser = useCallback(async () => {
@@ -73,7 +64,7 @@ export const AuthProviderWrapper = ({
       try {
         await authService.verify(storedToken)
 
-        const currentUser = authService.getUser(storedToken)
+        const { data: currentUser } = await authService.getUser(storedToken)
 
         setIsLoggedIn(true)
         setIsLoading(false)
