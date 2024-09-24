@@ -12,6 +12,7 @@ import { InvoicesPage } from '../pages/dashboard/InvoicesPage/InvoicesPage'
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner'
 import PrivateRoute from '../components/PrivateRoute/PrivateRoute'
 import { EditProductPage } from '../pages/dashboard/EditProductPage/EditProductPage'
+import { NewInvoicePage } from '../pages/dashboard/NewInvoicePage/NewInvoicePage'
 
 export const AppRoutes: React.FC = () => {
   const { isLoading } = useContext(AuthContext)
@@ -30,6 +31,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/dashboard/products/:productId" element={<PrivateRoute element={<ViewProductPage />} />} />
       <Route path="/dashboard/products/:productId/edit" element={<PrivateRoute element={<EditProductPage />} />} />
       <Route path="/dashboard/invoices" element={<PrivateRoute element={<InvoicesPage />} />} />
+      <Route path="/dashboard/invoices/new" element={<PrivateRoute element={<NewInvoicePage />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   )
