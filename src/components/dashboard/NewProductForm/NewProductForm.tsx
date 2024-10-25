@@ -6,6 +6,8 @@ import cloudImagesService from '../../../services/cloud_images.service'
 import { MessageContext } from '../../../context/userMessage.context'
 import { Product } from '../../../types/product.type'
 import styled from 'styled-components'
+import { AuthContext } from '../../../context/auth.context'
+import { titleize } from '../../../utils/tools'
 
 const NewProductTag = styled.span`
   background-color: #d3d0d0;
@@ -64,6 +66,7 @@ export const NewProductForm: React.FC = () => {
 
   const [loadingImage, setLoadingImage] = useState(false)
   const { setShowMessage, setMessageInfo } = useContext(MessageContext)
+  const { user } = useContext(AuthContext)
 
   const navigate = useNavigate()
 
@@ -180,97 +183,97 @@ export const NewProductForm: React.FC = () => {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Nombre</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Nombre del producto"
-          required
-          name="name"
-          value={product.name}
+    user && (
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label>Nombre</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Nombre del producto"
+            required
+            name="name"
+            value={product.name}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label>Descripción</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Descripción del producto"
+            required
+            name="description"
+            value={product.description}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label>Precio</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="Precio del producto"
+            required
+            name="price"
+            value={product.price}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+        <Form.Group controlId="formFileMultiple" className="mb-3">
+          <Form.Label>Imagenes</Form.Label>
+          <Form.Control type="file" multiple required name="imageUrl" onChange={uploadProductImages} />
+        </Form.Group>
+        <ImagesPreview>
+          {product.imageUrl?.map((image, idx) => {
+            return (
+              <div key={idx}>
+                <DeleteImageBtn type="button" onClick={() => deleteImage(image)} className={`image-${idx}`}>
+                  <i className="fa-solid fa-xmark"></i>
+                </DeleteImageBtn>
+                <PicturePreview className={`preview preview-${idx + 1}`}>
+                  <img src={image} alt={`preview-${idx + 1}`} />
+                </PicturePreview>
+              </div>
+            )
+          })}
+        </ImagesPreview>
+        <Form.Check
+          type="switch"
+          id="custom-switch"
+          label="Producto en venta?"
+          name="onSell"
           onChange={handleInputChange}
         />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Descripción</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Descripción del producto"
-          required
-          name="description"
-          value={product.description}
+        <Form.Check
+          type="switch"
+          id="custom-switch"
+          label="Producto en stock?"
+          name="inStock"
           onChange={handleInputChange}
         />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Precio</Form.Label>
-        <Form.Control
-          type="number"
-          placeholder="Precio del producto"
-          required
-          name="price"
-          value={product.price}
-          onChange={handleInputChange}
-        />
-      </Form.Group>
-      <Form.Group controlId="formFileMultiple" className="mb-3">
-        <Form.Label>Imagenes</Form.Label>
-        <Form.Control type="file" multiple required name="imageUrl" onChange={uploadProductImages} />
-      </Form.Group>
-      <ImagesPreview>
-        {product.imageUrl?.map((image, idx) => {
-          return (
-            <div key={idx}>
-              <DeleteImageBtn type="button" onClick={() => deleteImage(image)} className={`image-${idx}`}>
-                <i className="fa-solid fa-xmark"></i>
-              </DeleteImageBtn>
-              <PicturePreview className={`preview preview-${idx + 1}`}>
-                <img src={image} alt={`preview-${idx + 1}`} />
-              </PicturePreview>
-            </div>
-          )
-        })}
-      </ImagesPreview>
-      <Form.Check
-        type="switch"
-        id="custom-switch"
-        label="Producto en venta?"
-        name="onSell"
-        onChange={handleInputChange}
-      />
-      <Form.Check
-        type="switch"
-        id="custom-switch"
-        label="Producto en stock?"
-        name="inStock"
-        onChange={handleInputChange}
-      />
-      <h6>Elegir etiquetas:</h6>
-      <Form.Select aria-label="Default select example" name="tags" multiple onChange={handleSelect}>
-        <option onClick={removeSelectAttr} value="Tools">
-          Herramientas
-        </option>
-        <option onClick={removeSelectAttr} value="Machinery">
-          Maquinaria
-        </option>
-        <option onClick={removeSelectAttr} value="Materials">
-          Materiales
-        </option>
-      </Form.Select>
-      <br />
-      <p>
-        Etiquetas seleccionadas:{' '}
-        {product.tags.map((el, idx) => (
-          <NewProductTag key={idx}>{el}</NewProductTag>
-        ))}
-      </p>
-      <Button variant="primary" type="submit" disabled={loadingImage}>
-        {loadingImage ? 'Espere...' : 'Crear'}
-      </Button>
-      <Button variant="danger" type="button" onClick={deleteImages}>
-        Cancelar
-      </Button>
-    </Form>
+        <h6>Elegir etiquetas:</h6>
+        <Form.Select aria-label="Default select example" name="tags" multiple onChange={handleSelect}>
+          {user.tags.map((tag, idx) => {
+            return (
+              <option key={idx} onClick={removeSelectAttr} value={tag}>
+                {titleize(tag)}
+              </option>
+            )
+          })}
+        </Form.Select>
+        <br />
+        <p>
+          Etiquetas seleccionadas:{' '}
+          {product.tags.map((el, idx) => (
+            <NewProductTag key={idx}>{el}</NewProductTag>
+          ))}
+        </p>
+        <Button variant="primary" type="submit" disabled={loadingImage}>
+          {loadingImage ? 'Espere...' : 'Crear'}
+        </Button>
+        <Button variant="danger" type="button" onClick={deleteImages}>
+          Cancelar
+        </Button>
+      </Form>
+    )
   )
 }
