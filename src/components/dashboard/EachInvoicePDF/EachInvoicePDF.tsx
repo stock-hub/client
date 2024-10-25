@@ -14,7 +14,11 @@ Font.register({
   ]
 })
 
-export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User }> = ({ invoice, user }) => {
+export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: string }> = ({
+  invoice,
+  user,
+  signUrl
+}) => {
   return (
     <Document>
       <Page size="A4" style={styles.container}>
@@ -67,6 +71,7 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User }> = ({ inv
             <Text style={styles.cellSmall}>$ {invoice.totalValue}</Text>
           </View>
         </View>
+        <Image source={signUrl} style={styles.signature} />
         <View style={styles.footer}>
           <View style={styles.divider}></View>
           <Text style={styles.footerLink}>cyrequiposyconstrucciones.com</Text>

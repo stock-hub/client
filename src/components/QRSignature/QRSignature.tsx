@@ -5,7 +5,7 @@ export const QRSignature: React.FC<{ invoiceId: string }> = ({ invoiceId }) => {
   const [signUrl] = useState(`${window.location.origin}/dashboard/invoices/sign?invoiceId=${invoiceId}`)
 
   return (
-    <div>
+    <div style={{ width: '100%', textAlign: 'center', margin: '10px' }}>
       <a href={signUrl} target="_blank">
         Link
       </a>

@@ -113,6 +113,12 @@ export const pdfStyles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 5
   },
+  signature: {
+    width: '250px',
+    marginTop: 20,
+    marginRight: 20,
+    alignSelf: 'flex-end'
+  },
   footer: {
     position: 'absolute',
     bottom: 0,

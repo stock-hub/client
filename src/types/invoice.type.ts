@@ -25,3 +25,9 @@ export interface Invoice {
   createdAt?: string
   updatedAt?: string
 }
+
+export interface InvoiceSignatureResponse {
+  data: {
+    signature: string
+  }
+}

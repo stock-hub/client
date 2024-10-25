@@ -3,11 +3,15 @@ import { Button, Col, Container, Dropdown, Form, Modal, Row, Table } from 'react
 import { useNavigate } from 'react-router-dom'
 import { MessageContext } from '../../../context/userMessage.context'
 import invoiceService from '../../../services/invoice.service'
-import { Invoice, InvoiceProduct } from '../../../types/invoice.type'
-import { formatDate, generateInvoiceId } from '../../../utils/tools'
-import { Product, ProductResponse } from '../../../types/product.type'
 import productService from '../../../services/products.service'
+import { Invoice, InvoiceProduct, InvoiceSignatureResponse } from '../../../types/invoice.type'
+import { Product, ProductResponse } from '../../../types/product.type'
+import { formatDate, generateInvoiceId } from '../../../utils/tools'
 import { QRSignature } from '../../QRSignature/QRSignature'
+import { pdf } from '@react-pdf/renderer'
+import { EachInvoicePDF } from '../EachInvoicePDF/EachInvoicePDF'
+import { AuthContext } from '../../../context/auth.context'
+import cloudFilesService from '../../../services/cloud_files.service'
 
 export const NewInvoiceForm: React.FC = () => {
   const [invoiceId] = useState(generateInvoiceId())
@@ -35,6 +39,8 @@ export const NewInvoiceForm: React.FC = () => {
   const [isProductSelected, setIsProductSelected] = useState(false)
   const [productPrice, setProductPrice] = useState<number>(0)
   const [show, setShow] = useState(false)
+  const [signUrl, setSignUrl] = useState<string>('')
+  const { user } = useContext(AuthContext)
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -124,35 +130,60 @@ export const NewInvoiceForm: React.FC = () => {
     setIsProductSelected(false)
   }
 
+  const uploadInvoicePdf = async (invoice: Invoice) => {
+    const pdfDocument = user && pdf(<EachInvoicePDF invoice={invoice} signUrl={signUrl} user={user} />)
+    if (!pdfDocument) return
+
+    const pdfBlob = await pdfDocument.toBlob()
+
+    const formData = new FormData()
+    formData.append('file', pdfBlob)
+    formData.append('fileId', invoice.invoiceId!)
+
+    cloudFilesService.uploadFile(formData).catch((err: Error) => {
+      setShowMessage(true)
+      setMessageInfo(err.message)
+    })
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!invoiceProducts.length) {
-      setInvoice((prevState) => ({
-        ...prevState,
-        totalValue: productPrice * invoiceProduct.quantity,
-        products: [...prevState.products, invoiceProduct]
-      }))
-    } else {
-      setInvoice((prevState) => ({
-        ...prevState,
-        products: invoiceProducts
-      }))
+    const updatedInvoice = {
+      ...invoice,
+      products: invoiceProducts.length ? invoiceProducts : [invoiceProduct],
+      ...(!invoiceProducts.length && { totalValue: productPrice * invoiceProduct.quantity })
     }
 
+    setInvoice(updatedInvoice)
+
     invoiceService
-      .newInvoice(invoice)
-      .then(() => navigate('/dashboard/invoices'))
+      .newInvoice(updatedInvoice)
+      .then(({ data }: { data: Invoice }) => {
+        uploadInvoicePdf(data)
+        navigate('/dashboard/invoices')
+      })
       .catch((err: Error) => {
         setShowMessage(true)
         setMessageInfo(err.message)
       })
   }
 
-  const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true)
+  const handleClose = () => {
+    setShow(false)
 
-  console.log(invoiceId)
+    invoiceService
+      .getSignature(invoiceId)
+      .then(({ data }: InvoiceSignatureResponse) => {
+        setSignUrl(data.signature)
+      })
+      .catch((err: Error) => {
+        setShowMessage(true)
+        setMessageInfo(err.message)
+      })
+  }
+
+  const handleShow = () => setShow(true)
 
   return (
     <Container className="mt-5">
@@ -299,23 +330,26 @@ export const NewInvoiceForm: React.FC = () => {
             </Form.Group>
           </Col>
         </Row>
+        <br />
+        {signUrl && <img src={signUrl} alt="Signature" />}
+        <br />
+        <br />
         <Button variant="success" style={{ marginRight: '1rem' }} onClick={handleAddNewProduct}>
           Añadir nuevo producto a factura
         </Button>
-        {/* <Button variant="secondary" style={{ marginRight: '1rem' }} onClick={handleShow}> // TODO: Create next step which is to sign the pdf
-          Firmar factura
-        </Button>
+        {!signUrl && (
+          <Button variant="secondary" style={{ marginRight: '1rem' }} onClick={handleShow}>
+            Firmar factura
+          </Button>
+        )}
         <Modal show={show} onHide={handleShow}>
           <QRSignature invoiceId={invoiceId} />
-          <Button variant="secondary" onClick={handleClose}>
-            Close
+          <Button style={{ width: '90%', margin: '1rem auto' }} variant="secondary" onClick={handleClose}>
+            Cerrar
           </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal> */}
+        </Modal>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" disabled={!Boolean(signUrl)}>
           Crear factura
         </Button>
       </Form>
