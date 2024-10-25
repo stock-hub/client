@@ -1,11 +1,12 @@
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { Container } from 'react-bootstrap'
+import { Button, Container } from 'react-bootstrap'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
 import invoiceService from '../../../services/invoice.service'
 import { Invoice } from '../../../types/invoice.type'
 import { EachInvoicePDF } from '../EachInvoicePDF/EachInvoicePDF'
+import cloudFilesService from '../../../services/cloud_files.service'
 
 interface InvoicesResponse {
   invoices: Invoice[]
@@ -35,6 +36,43 @@ export const InvoicesList: React.FC = () => {
     fetchInvoices(page, query, isRentedCheck)
   }, [])
 
+  const downloadInvoice = async (invoiceId: string) => {
+    try {
+      const response = await cloudFilesService.downloadFile(invoiceId)
+
+      if (response.status !== 200) {
+        throw new Error(`Error al descargar el archivo: ${response.status} ${response.statusText}`)
+      }
+
+      const fileName = `${invoiceId}.pdf`
+
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const removeInvoice = (invoiceId: string) => {
+    invoiceService
+      .deleteInvoice(invoiceId)
+      .then(() => {
+        cloudFilesService.deleteFile(invoiceId)
+        const updatedInvoices = invoicesList.filter((invoice) => invoice.invoiceId !== invoiceId)
+
+        setInvoicesList(updatedInvoices)
+      })
+      .catch((err: Error) => console.error(err))
+  }
+
   return (
     <Container>
       {user &&
@@ -45,15 +83,20 @@ export const InvoicesList: React.FC = () => {
               <div>
                 <p>Factura nº: {invoice.invoiceId}</p>
                 <p>Cliente: {invoice.clientName}</p>
-                <p>Cliente Documento Identidad: {invoice.clientId}</p>
-                <PDFDownloadLink
-                  document={<EachInvoicePDF invoice={invoice} user={user} />}
-                  fileName={`${invoice.invoiceId}.pdf`}
+                <p>Documento Identidad: {invoice.clientId}</p>
+                <Link className="btn btn-secondary" to={`/dashboard/invoices/${invoice._id}`}>
+                  Ver
+                </Link>
+                <Button style={{ marginLeft: '1rem' }} onClick={() => downloadInvoice(invoice.invoiceId!)}>
+                  Descargar PDF
+                </Button>
+                <Button
+                  style={{ marginLeft: '1rem' }}
+                  variant="danger"
+                  onClick={() => removeInvoice(invoice.invoiceId!)}
                 >
-                  <span>Descargar PDF</span>
-                </PDFDownloadLink>
-                <br />
-                <Link to={`/dashboard/invoices/${invoice._id}`}>Ver</Link>
+                  Borrar factura
+                </Button>
               </div>
               <br />
             </div>

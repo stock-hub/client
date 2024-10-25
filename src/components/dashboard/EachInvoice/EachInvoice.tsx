@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
 import invoiceService from '../../../services/invoice.service'
 import { Invoice } from '../../../types/invoice.type'
@@ -15,11 +15,13 @@ import {
   UsersInfo
 } from './EachInvoice.styled'
 import { Product } from '../../../types/product.type'
+import { Button } from 'react-bootstrap'
 
 export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = false }) => {
   const { user } = useContext(AuthContext)
   const [invoice, setInvoice] = useState<Invoice | undefined>(undefined)
   const { invoiceId } = useParams<string>()
+  const navigate = useNavigate()
 
   useEffect(() => {
     invoiceService
@@ -32,6 +34,9 @@ export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = fa
     user &&
     invoice && (
       <Container $download={isDownload}>
+        <Button variant="outline-secondary" onClick={() => navigate(-1)}>
+          Volver
+        </Button>
         <Header>
           <img src={user.logoUrl} alt="Company logo" />
           <div>

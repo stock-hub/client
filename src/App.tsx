@@ -6,11 +6,11 @@ import { UserMessage } from './components/UserMessage/UserMessage'
 import { AppRoutes } from './routes/AppRoutes'
 
 export const App: React.FC = () => {
-  const excludedRoute = '/'
+  const excludedRoutes = ['/', '/dashboard/invoices/sign']
 
   return (
     <>
-      {!excludedRoute.includes(window.location.pathname) && <NavBar />}
+      {!excludedRoutes.includes(window.location.pathname) && <NavBar />}
       <AppRoutes />
       <UserMessage />
     </>

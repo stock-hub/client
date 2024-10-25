@@ -33,6 +33,18 @@ class InvoiceService {
   newInvoice(invoice: Invoice) {
     return this.axios.post('/new', invoice)
   }
+
+  newSignature(invoiceId: string, signature: string) {
+    return this.axios.post(`/${invoiceId}/sign`, { signature })
+  }
+
+  getSignature(invoiceId: string) {
+    return this.axios.get(`/${invoiceId}/sign/view`)
+  }
+
+  deleteInvoice(invoiceId: string) {
+    return this.axios.delete(`/${invoiceId}/delete`)
+  }
 }
 
 const invoiceService = new InvoiceService()
