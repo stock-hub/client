@@ -1,11 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react'
 import authService from '../services/auth.service'
-
-interface User {
-  username: string
-  _id: string
-  tags: string[]
-}
+import { User } from '../types/user.type'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -16,6 +11,7 @@ interface AuthContextType {
   storeToken: (token: string) => void
   authenticateUser: () => Promise<void>
   logInUser: (username: string, password: string) => Promise<void>
+  logInTmp: () => Promise<void>
   logOutUser: () => void
 }
 
@@ -28,6 +24,7 @@ export const AuthContext = createContext<AuthContextType>({
   storeToken: () => {},
   authenticateUser: async () => {},
   logInUser: async () => {},
+  logInTmp: async () => {},
   logOutUser: () => {}
 })
 
@@ -93,6 +90,42 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
     }
   }
 
+  const tmpAuth = useCallback(async () => {
+    const storedToken = getToken()
+
+    if (!storedToken) {
+      logOutUser()
+    } else {
+      try {
+        await authService.verify(storedToken)
+
+        setIsLoggedIn(true)
+        setIsLoading(false)
+      } catch {
+        logOutUser()
+        setIsLoading(false)
+      }
+    }
+  }, [])
+
+  const logInTmp = async () => {
+    setIsLoading(true)
+
+    try {
+      const {
+        data: { authToken }
+      }: LoginResponse = await authService.sign()
+
+      storeToken(authToken)
+      await tmpAuth()
+    } catch (err) {
+      console.error(err)
+      logOutUser()
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const logOutUser = () => {
     removeToken()
     setIsLoggedIn(false)
@@ -115,6 +148,7 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
         storeToken,
         authenticateUser,
         logInUser,
+        logInTmp,
         logOutUser
       }}
     >

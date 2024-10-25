@@ -12,8 +12,7 @@ class AuthService {
     })
 
     this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
-      const storedToken =
-        localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+      const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
         config.headers = { Authorization: `Bearer ${storedToken}` }
@@ -31,6 +30,10 @@ class AuthService {
     return this.axios.get('/verify', {
       headers: { Authorization: `Bearer ${token}` }
     })
+  }
+
+  sign() {
+    return this.axios.post('/login')
   }
 
   getUser(token: string) {

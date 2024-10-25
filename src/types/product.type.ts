@@ -2,7 +2,7 @@ export interface Product {
   _id?: string
   name: string
   description: string
-  price: string
+  price: number
   imageUrl: Array<string>
   tags: Array<string>
   onSell: string
@@ -33,3 +33,10 @@ export interface ProductContextProps {
   changePage: (num: number) => void
   deleteProduct: (id: string) => void
 }
+
+export interface ProductListResponse {
+  products: Product[]
+  total_pages: number
+}
+
+export type ProductResponse = Product[]

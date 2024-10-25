@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Invoice } from '../../../types/invoice.type'
-import invoiceService from '../../../services/invoice.service'
-import { useSearchParams } from 'react-router-dom'
-import { Container } from 'react-bootstrap'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { InvoicePDF } from '../../InvoicePDF/InvoicePdf'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { Container } from 'react-bootstrap'
+import { Link, useSearchParams } from 'react-router-dom'
+import { AuthContext } from '../../../context/auth.context'
+import invoiceService from '../../../services/invoice.service'
+import { Invoice } from '../../../types/invoice.type'
+import { EachInvoicePDF } from '../EachInvoicePDF/EachInvoicePDF'
 
 interface InvoicesResponse {
   invoices: Invoice[]
@@ -18,6 +19,7 @@ export const InvoicesList: React.FC = () => {
   const page = Number(searchParams.get('page')) || 1
   const [query, setQuery] = useState<string>(searchParams.get('query') || '')
   const [isRentedCheck, setIsRentedCheck] = useState<boolean>(false)
+  const { user } = useContext(AuthContext)
 
   const fetchInvoices = useCallback((page: number, query: string, isRented: boolean) => {
     invoiceService
@@ -35,21 +37,28 @@ export const InvoicesList: React.FC = () => {
 
   return (
     <Container>
-      {invoicesList?.map((invoice, idx) => {
-        return (
-          <div key={idx}>
-            <div>
-              <p>Producto: {typeof invoice.product === 'string' ? invoice.product : invoice.product.name}</p>
-              <p>Cliente: {invoice.clientName}</p>
-              <p>Cliente Documento Identidad: {invoice.clientId}</p>
-              <PDFDownloadLink document={<InvoicePDF invoice={invoice} />} fileName={`${invoice.fileId}.pdf`}>
-                <span>Descargar PDF</span>
-              </PDFDownloadLink>
+      {user &&
+        invoicesList &&
+        invoicesList.map((invoice, idx) => {
+          return (
+            <div key={idx}>
+              <div>
+                <p>Factura nº: {invoice.invoiceId}</p>
+                <p>Cliente: {invoice.clientName}</p>
+                <p>Cliente Documento Identidad: {invoice.clientId}</p>
+                <PDFDownloadLink
+                  document={<EachInvoicePDF invoice={invoice} user={user} />}
+                  fileName={`${invoice.invoiceId}.pdf`}
+                >
+                  <span>Descargar PDF</span>
+                </PDFDownloadLink>
+                <br />
+                <Link to={`/dashboard/invoices/${invoice._id}`}>Ver</Link>
+              </div>
+              <br />
             </div>
-            <br />
-          </div>
-        )
-      })}
+          )
+        })}
     </Container>
   )
 }

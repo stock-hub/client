@@ -15,7 +15,7 @@ export const EditProductPage: React.FC = () => {
     _id: '',
     name: '',
     description: '',
-    price: '',
+    price: '' as unknown as number,
     imageUrl: [],
     tags: [],
     onSell: '',

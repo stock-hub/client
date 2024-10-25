@@ -26,6 +26,10 @@ class InvoiceService {
     })
   }
 
+  getInvoice(invoiceId: string) {
+    return this.axios.get(`/${invoiceId}/view`)
+  }
+
   newInvoice(invoice: Invoice) {
     return this.axios.post('/new', invoice)
   }

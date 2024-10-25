@@ -3,7 +3,7 @@ import { Button, ButtonGroup } from 'react-bootstrap'
 import { useSearchParams } from 'react-router-dom'
 import EachProduct from '../EachProduct/EachProduct'
 import productService from '../../../services/products.service'
-import { Product } from '../../../types/product.type'
+import { Product, ProductListResponse } from '../../../types/product.type'
 import {
   Container,
   FormCheck,
@@ -14,11 +14,6 @@ import {
 } from './ProductsList.styled'
 import { AuthContext } from '../../../context/auth.context'
 import { titleize } from '../../../utils/tools'
-
-interface IProductResponse {
-  products: Product[]
-  total_pages: number
-}
 
 export const ProductsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -34,7 +29,7 @@ export const ProductsList: React.FC = () => {
   const fetchProducts = useCallback((page: number, query: string, tags: string) => {
     productService
       .getProductsList(page, query, tags.split(' ').join(','))
-      .then(({ data }: { data: IProductResponse }) => {
+      .then(({ data }: { data: ProductListResponse }) => {
         setProductsList(data.products)
         setTotalPages(data.total_pages)
       })

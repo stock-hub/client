@@ -55,7 +55,7 @@ export const NewProductForm: React.FC = () => {
   const [product, setProduct] = useState<Product>({
     name: '',
     description: '',
-    price: '',
+    price: '' as unknown as number,
     imageUrl: [],
     onSell: 'off',
     inStock: 'off',

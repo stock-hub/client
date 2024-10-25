@@ -1,32 +1,27 @@
 import { Product } from './product.type'
+import { User } from './user.type'
+
+export interface InvoiceProduct {
+  product: string | Product
+  name: string
+  quantity: number
+  valuePerDay?: number
+  return?: string
+  deposit?: number
+}
 
 export interface Invoice {
   _id?: string
-  user?: {
-    _id?: string
-    username: string
-    password: string
-    logoUrl: string
-    companyName: string
-    phone: number
-    address: string
-    nif: string
-    tags: string[]
-    createdAt: Date
-    updatedAt: Date
-  }
-  product: Product | string
-  quantity: number
-  valuePerDay?: number
+  user?: User
+  products: InvoiceProduct[]
   totalValue: number
-  deposit?: number
-  deliver: Date
-  return?: Date
+  deliver: string
   clientName: string
   clientAddress: string
   clientId: string
-  clientTelephone: number | string
-  fileId: string
-  createdAt?: Date
-  updatedAt?: Date
+  clientTelephone: number
+  clientSignature?: string
+  invoiceId?: string
+  createdAt?: string
+  updatedAt?: string
 }
