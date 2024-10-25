@@ -12,7 +12,7 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
   const [updatedProduct, setUpdatedProduct] = useState<Product>({
     name: '',
     description: '',
-    price: '',
+    price: '' as unknown as number,
     imageUrl: [],
     onSell: 'off',
     inStock: 'off',

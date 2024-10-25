@@ -13,11 +13,11 @@ interface InvoicesResponse {
 
 export const InvoicesList: React.FC = () => {
   const [invoicesList, setInvoicesList] = useState<Invoice[]>([])
-  const [totalPages, setTotalPages] = useState<number>(1)
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [_totalPages, setTotalPages] = useState<number>(1)
+  const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
-  const [query, setQuery] = useState<string>(searchParams.get('query') || '')
-  const [isRentedCheck, setIsRentedCheck] = useState<boolean>(false)
+  const [query] = useState<string>(searchParams.get('query') || '')
+  const [isRentedCheck] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
 
   const fetchInvoices = useCallback((page: number, query: string, isRented: boolean) => {
