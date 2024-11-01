@@ -1,19 +1,24 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { Invoice } from '../types/invoice.type'
 
 class InvoiceService {
-  axios: any
+  axios: AxiosInstance
 
   constructor() {
     this.axios = axios.create({
       baseURL: `${import.meta.env.VITE_API_URL}/invoices`
     })
 
-    this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
+    this.axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
-        config.headers = { Authorization: `Bearer ${storedToken}` }
+        if (config.headers instanceof AxiosHeaders) {
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        } else {
+          config.headers = new AxiosHeaders()
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        }
       }
 
       return config
@@ -27,7 +32,7 @@ class InvoiceService {
   }
 
   getInvoice(invoiceId: string) {
-    return this.axios.get(`/${invoiceId}/view`)
+    return this.axios.get<Invoice>(`/${invoiceId}/view`)
   }
 
   newInvoice(invoice: Invoice) {

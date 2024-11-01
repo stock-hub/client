@@ -12,6 +12,7 @@ export interface User {
   address: string
   nif: string
   tags: string[]
+  invoiceTermsAndConditions: string
   additionalData?: Record<string, any>
 }
 

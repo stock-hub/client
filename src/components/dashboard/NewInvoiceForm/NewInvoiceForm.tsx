@@ -360,7 +360,7 @@ export const NewInvoiceForm: React.FC = () => {
           </Button>
         )}
         <Modal show={show} onHide={handleShow}>
-          <QRSignature invoiceId={invoiceId} />
+          {user && <QRSignature invoiceId={invoiceId} terms={user.invoiceTermsAndConditions} />}
           <Button style={{ width: '90%', margin: '1rem auto' }} variant="secondary" onClick={handleClose}>
             Cerrar
           </Button>
