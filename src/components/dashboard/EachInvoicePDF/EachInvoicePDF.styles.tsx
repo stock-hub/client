@@ -114,10 +114,15 @@ export const pdfStyles = StyleSheet.create({
     paddingHorizontal: 5
   },
   signature: {
-    width: '250px',
-    marginTop: 20,
-    marginRight: 20,
     alignSelf: 'flex-end'
+  },
+  signatureImage: {
+    width: '180px',
+    marginTop: 20,
+    marginRight: 20
+  },
+  signatureClientId: {
+    marginTop: 5
   },
   footer: {
     position: 'absolute',

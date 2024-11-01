@@ -1,17 +1,17 @@
+import { pdf } from '@react-pdf/renderer'
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Col, Container, Dropdown, Form, Modal, Row, Table } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../../context/auth.context'
 import { MessageContext } from '../../../context/userMessage.context'
+import cloudFilesService from '../../../services/cloud_files.service'
 import invoiceService from '../../../services/invoice.service'
 import productService from '../../../services/products.service'
 import { Invoice, InvoiceProduct, InvoiceSignatureResponse } from '../../../types/invoice.type'
 import { Product, ProductResponse } from '../../../types/product.type'
 import { formatDate, generateInvoiceId } from '../../../utils/tools'
 import { QRSignature } from '../../QRSignature/QRSignature'
-import { pdf } from '@react-pdf/renderer'
 import { EachInvoicePDF } from '../EachInvoicePDF/EachInvoicePDF'
-import { AuthContext } from '../../../context/auth.context'
-import cloudFilesService from '../../../services/cloud_files.service'
 
 export const NewInvoiceForm: React.FC = () => {
   const [invoiceId] = useState(generateInvoiceId())
@@ -22,6 +22,7 @@ export const NewInvoiceForm: React.FC = () => {
     clientName: '',
     clientAddress: '',
     clientId: '',
+    clientEmail: '',
     clientTelephone: undefined as unknown as number,
     invoiceId
   })
@@ -199,17 +200,19 @@ export const NewInvoiceForm: React.FC = () => {
             required
           />
         </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Domicilio</Form.Label>
-          <Form.Control
-            type="text"
-            name="clientAddress"
-            value={invoice.clientAddress}
-            onChange={handleInputChange}
-            required
-          />
-        </Form.Group>
         <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Domicilio</Form.Label>
+              <Form.Control
+                type="text"
+                name="clientAddress"
+                value={invoice.clientAddress}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+          </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Documento de Identidad</Form.Label>
@@ -217,6 +220,20 @@ export const NewInvoiceForm: React.FC = () => {
                 type="text"
                 name="clientId"
                 value={invoice.clientId}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Correo electrónico</Form.Label>
+              <Form.Control
+                type="email"
+                name="clientEmail"
+                value={invoice.clientEmail}
                 onChange={handleInputChange}
                 required
               />

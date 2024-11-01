@@ -19,6 +19,7 @@ export interface Invoice {
   clientName: string
   clientAddress: string
   clientId: string
+  clientEmail: string
   clientTelephone: number
   clientSignature?: string
   invoiceId?: string

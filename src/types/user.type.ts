@@ -12,6 +12,7 @@ export interface User {
   address: string
   nif: string
   tags: string[]
+  additionalData?: Record<string, any>
 }
 
 export interface Client {
@@ -19,6 +20,7 @@ export interface Client {
   name: string
   address: string
   dni: string
+  email: string
   phone: number
   imgUrl?: string
   boughtProducts?: Product[]

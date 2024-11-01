@@ -45,7 +45,9 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: s
         </View>
         <View style={styles.divider}></View>
         <View style={styles.invoiceDetails}>
-          <Text style={styles.invoiceDetailsText}>Nº factura: {invoice.invoiceId}</Text>
+          <Text style={styles.invoiceDetailsText}>
+            Nº {user.additionalData?.invoice.hidden ? 'pedido' : 'factura'}: {invoice.invoiceId}
+          </Text>
           <Text style={styles.invoiceDetailsText}>Fecha: {formatDate(invoice.deliver)}</Text>
         </View>
         <View style={styles.divider}></View>
@@ -71,7 +73,10 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: s
             <Text style={styles.cellSmall}>$ {invoice.totalValue}</Text>
           </View>
         </View>
-        <Image source={signUrl} style={styles.signature} />
+        <View style={styles.signature}>
+          <Image source={signUrl} style={styles.signatureImage} />
+          <Text style={styles.signatureClientId}>{invoice.clientId}</Text>
+        </View>
         <View style={styles.footer}>
           <View style={styles.divider}></View>
           <Text style={styles.footerLink}>cyrequiposyconstrucciones.com</Text>

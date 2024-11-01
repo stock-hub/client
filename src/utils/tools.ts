@@ -13,8 +13,10 @@ export function formatDate(dateString?: string, form: boolean = false): string {
   const day = date.getDate().toString().padStart(2, '0')
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const year = date.getFullYear()
+  const hour = date.getHours()
+  const minutes = date.getMinutes()
 
-  return form ? `${year}-${month}-${day}` : `${day}/${month}/${year}`
+  return form ? `${year}-${month}-${day}` : `${day}/${month}/${year} ${hour}:${minutes}`
 }
 
 export function generateInvoiceId() {

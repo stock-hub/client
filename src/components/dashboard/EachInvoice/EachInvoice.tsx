@@ -62,7 +62,7 @@ export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = fa
         <Divider />
         <InvoiceDetails>
           <p>
-            <b>Nº factura:</b> {invoice.invoiceId}
+            <b>Nº {user.additionalData?.invoice.hidden ? 'pedido' : 'factura'}:</b> {invoice.invoiceId}
           </p>
           <p>
             <b>Fecha:</b> {formatDate(invoice.deliver)}
