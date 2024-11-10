@@ -1,13 +1,13 @@
 import { useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Container, Nav, Navbar, NavDropdown, Button } from 'react-bootstrap'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Container, Nav, Navbar, Button } from 'react-bootstrap'
 import { AuthContext } from '../../context/auth.context'
 
 export const NavBar: React.FC = () => {
   const { isLoggedIn, logOutUser } = useContext(AuthContext)
   const navigate = useNavigate()
   const navigation = (): void => {
-    navigate('/dashboard/login')
+    navigate('/login')
   }
 
   return (
@@ -17,14 +17,20 @@ export const NavBar: React.FC = () => {
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
           <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
-            <Nav.Link href="/">Inicio</Nav.Link>
+            <Nav.Link as={Link} to="/">
+              Inicio
+            </Nav.Link>
             {isLoggedIn && (
               <>
-                <NavDropdown title="Dashboard" id="basic-nav-dropdown">
-                  <NavDropdown.Item href="/dashboard">Estadísticas</NavDropdown.Item>
-                  <NavDropdown.Item href="/dashboard/products?page=1">Productos</NavDropdown.Item>
-                  <NavDropdown.Item href="/dashboard/invoices">Facturas</NavDropdown.Item>
-                </NavDropdown>
+                <Nav.Link as={NavLink} to="/dashboard">
+                  Estadísticas
+                </Nav.Link>
+                <Nav.Link as={NavLink} to="/products?page=1">
+                  Productos
+                </Nav.Link>
+                <Nav.Link as={NavLink} to="/invoices">
+                  Facturas
+                </Nav.Link>
               </>
             )}
           </Nav>

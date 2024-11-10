@@ -175,7 +175,7 @@ export const NewProductForm: React.FC = () => {
 
     productService
       .newProduct(product)
-      .then(() => navigate('/dashboard/products?page=1'))
+      .then(() => navigate('/products?page=1'))
       .catch((err: Error) => {
         setShowMessage(true)
         setMessageInfo(err.message)

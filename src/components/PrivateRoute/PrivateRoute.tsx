@@ -12,7 +12,7 @@ const PrivateRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
   }
 
   if (!isLoggedIn) {
-    return <Navigate to="/dashboard/login" state={{ from: location }} />
+    return <Navigate to="/login" state={{ from: location }} />
   }
 
   return <>{element}</>

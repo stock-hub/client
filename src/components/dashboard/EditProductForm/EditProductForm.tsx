@@ -148,7 +148,7 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
       .editProduct(product._id!, updatedProduct)
       .then(() => {
         deleteRemovedImages()
-        navigate(`/dashboard/products/${product._id}`)
+        navigate(`/products/${product._id}`)
       })
       .catch((err: Error) => {
         setShowMessage(true)

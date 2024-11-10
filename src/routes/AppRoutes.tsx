@@ -26,19 +26,16 @@ export const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/dashboard/login" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<PrivateRoute element={<DashboardPage />} />} />
-      <Route path="/dashboard/products" element={<PrivateRoute element={<ProductsPage />} />} />
-      <Route path="/dashboard/products/new" element={<PrivateRoute element={<NewProductPage />} />} />
-      <Route path="/dashboard/products/:productId" element={<PrivateRoute element={<ViewProductPage />} />} />
-      <Route path="/dashboard/products/:productId/edit" element={<PrivateRoute element={<EditProductPage />} />} />
-      <Route path="/dashboard/invoices" element={<PrivateRoute element={<InvoicesPage />} />} />
-      <Route path="/dashboard/invoices/new" element={<PrivateRoute element={<NewInvoicePage />} />} />
-      <Route path="/dashboard/invoices/sign" element={<SignaturePage />} />
-      <Route
-        path="/dashboard/invoices/:invoiceId"
-        element={<PrivateRoute element={<EachInvoice isDownload={false} />} />}
-      />
+      <Route path="/products" element={<PrivateRoute element={<ProductsPage />} />} />
+      <Route path="/products/new" element={<PrivateRoute element={<NewProductPage />} />} />
+      <Route path="/products/:productId" element={<PrivateRoute element={<ViewProductPage />} />} />
+      <Route path="/products/:productId/edit" element={<PrivateRoute element={<EditProductPage />} />} />
+      <Route path="/invoices" element={<PrivateRoute element={<InvoicesPage />} />} />
+      <Route path="/invoices/new" element={<PrivateRoute element={<NewInvoicePage />} />} />
+      <Route path="/invoices/sign" element={<SignaturePage />} />
+      <Route path="/invoices/:invoiceId" element={<PrivateRoute element={<EachInvoice isDownload={false} />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   )

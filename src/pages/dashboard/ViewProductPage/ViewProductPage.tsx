@@ -46,7 +46,7 @@ export const ViewProductPage: React.FC = () => {
         <p>${product.price}</p>
         <p>{onSell}</p>
         <p>{product.description}</p>
-        <Link className="btn btn-outline-info" to={`/dashboard/products/${product._id}/edit`}>
+        <Link className="btn btn-outline-info" to={`/products/${product._id}/edit`}>
           Editar
         </Link>
       </Container>

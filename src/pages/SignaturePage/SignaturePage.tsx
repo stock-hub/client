@@ -28,7 +28,7 @@ export const SignaturePage: React.FC = () => {
 
     if (!invoiceId) {
       timer = setTimeout(() => {
-        navigate('/dashboard/login')
+        navigate('/login')
       }, 3000)
     } else {
       setIsLoading(false)

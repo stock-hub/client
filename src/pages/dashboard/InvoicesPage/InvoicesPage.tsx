@@ -7,7 +7,7 @@ export const InvoicesPage: React.FC = () => {
   return (
     <Container>
       <h3>Facturas</h3>
-      <Link to="/dashboard/invoices/new" className="btn btn-outline-primary">
+      <Link to="/invoices/new" className="btn btn-outline-primary">
         Crear nueva factura
       </Link>
       <br />

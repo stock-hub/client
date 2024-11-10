@@ -82,7 +82,7 @@ export const InvoicesList: React.FC = () => {
                 <p>Factura nº: {invoice.invoiceId}</p>
                 <p>Cliente: {invoice.clientName}</p>
                 <p>Documento Identidad: {invoice.clientId}</p>
-                <Link className="btn btn-secondary" to={`/dashboard/invoices/${invoice._id}`}>
+                <Link className="btn btn-secondary" to={`/invoices/${invoice._id}`}>
                   Ver
                 </Link>
                 <Button style={{ marginLeft: '1rem' }} onClick={() => downloadInvoice(invoice.invoiceId!)}>

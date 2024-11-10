@@ -162,7 +162,7 @@ export const NewInvoiceForm: React.FC = () => {
       .newInvoice(updatedInvoice)
       .then(({ data }: { data: Invoice }) => {
         uploadInvoicePdf(data)
-        navigate('/dashboard/invoices')
+        navigate('/invoices')
       })
       .catch((err: Error) => {
         setShowMessage(true)

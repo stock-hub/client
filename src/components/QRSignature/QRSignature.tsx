@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 export const QRSignature: React.FC<{ invoiceId: string; terms: string }> = ({ invoiceId, terms }) => {
   const [signUrl] = useState(
-    `${window.location.origin}/dashboard/invoices/sign?invoiceId=${invoiceId}&data=${btoa(encodeURIComponent(terms))}`
+    `${window.location.origin}/invoices/sign?invoiceId=${invoiceId}&data=${btoa(encodeURIComponent(terms))}`
   )
 
   return (

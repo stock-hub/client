@@ -34,7 +34,7 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
           })}
         </Col>
         <Col md="2">
-          <ActionLink className="btn btn-outline-info" to={`/dashboard/products/${product._id}`}>
+          <ActionLink className="btn btn-outline-info" to={`/products/${product._id}`}>
             Abrir
           </ActionLink>{' '}
           <Button
