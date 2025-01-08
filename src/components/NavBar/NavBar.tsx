@@ -2,6 +2,16 @@ import { useContext } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Container, Nav, Navbar, Button } from 'react-bootstrap'
 import { AuthContext } from '../../context/auth.context'
+import styled from 'styled-components'
+
+const Settings = styled.div`
+  display: flex;
+  align-items: baseline;
+
+  & a {
+    margin-right: 1rem;
+  }
+`
 
 export const NavBar: React.FC = () => {
   const { isLoggedIn, logOutUser } = useContext(AuthContext)
@@ -34,19 +44,24 @@ export const NavBar: React.FC = () => {
               </>
             )}
           </Nav>
-          <div>
+          <Settings>
             {isLoggedIn && (
-              <Button
-                variant="outline-danger"
-                onClick={() => {
-                  logOutUser()
-                  navigation()
-                }}
-              >
-                Sign out
-              </Button>
+              <>
+                <Nav.Link as={NavLink} to="/settings">
+                  Configuración
+                </Nav.Link>
+                <Button
+                  variant="outline-danger"
+                  onClick={() => {
+                    logOutUser()
+                    navigation()
+                  }}
+                >
+                  Sign out
+                </Button>
+              </>
             )}
-          </div>
+          </Settings>
         </Navbar.Collapse>
       </Container>
     </Navbar>

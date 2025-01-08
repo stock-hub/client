@@ -1,17 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useState, useEffect, useCallback } from 'react'
 import authService from '../services/auth.service'
 import { User } from '../types/user.type'
+import { AxiosError } from 'axios'
 
 interface AuthContextType {
   isLoggedIn: boolean
   isLoading: boolean
   rememberUser: boolean
   user: User | null
+  authError: string | null
+  showError: boolean
   setRememberUser: React.Dispatch<React.SetStateAction<boolean>>
   storeToken: (token: string) => void
   authenticateUser: () => Promise<void>
   logInUser: (username: string, password: string) => Promise<void>
-  logInTmp: () => Promise<void>
   logOutUser: () => void
 }
 
@@ -20,11 +23,12 @@ export const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   rememberUser: false,
   user: null,
+  authError: null,
+  showError: false,
   setRememberUser: () => {},
   storeToken: () => {},
   authenticateUser: async () => {},
   logInUser: async () => {},
-  logInTmp: async () => {},
   logOutUser: () => {}
 })
 
@@ -39,6 +43,8 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [rememberUser, setRememberUser] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [showError, setShowError] = useState<boolean>(false)
 
   const storeToken = (token: string) => {
     rememberUser ? localStorage.setItem('authToken', token) : sessionStorage.setItem('authToken', token)
@@ -83,44 +89,13 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
       storeToken(authToken)
       await authenticateUser()
     } catch (err) {
-      console.error(err)
-      logOutUser()
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      if (err instanceof AxiosError && err.response) {
+        const { message } = err.response.data
 
-  const tmpAuth = useCallback(async () => {
-    const storedToken = getToken()
-
-    if (!storedToken) {
-      logOutUser()
-    } else {
-      try {
-        await authService.verify(storedToken)
-
-        setIsLoggedIn(true)
-        setIsLoading(false)
-      } catch {
-        logOutUser()
-        setIsLoading(false)
+        setAuthError(message)
+        setShowError(true)
       }
-    }
-  }, [])
-
-  const logInTmp = async () => {
-    setIsLoading(true)
-
-    try {
-      const {
-        data: { authToken }
-      }: LoginResponse = await authService.sign()
-
-      storeToken(authToken)
-      await tmpAuth()
-    } catch (err) {
       console.error(err)
-      logOutUser()
     } finally {
       setIsLoading(false)
     }
@@ -131,6 +106,8 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
     setIsLoggedIn(false)
     setIsLoading(false)
     setUser(null)
+    setAuthError(null)
+    setShowError(false)
   }
 
   useEffect(() => {
@@ -144,11 +121,12 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
         isLoading,
         rememberUser,
         user,
+        authError,
+        showError,
         setRememberUser,
         storeToken,
         authenticateUser,
         logInUser,
-        logInTmp,
         logOutUser
       }}
     >

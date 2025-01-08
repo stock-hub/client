@@ -1,21 +1,27 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
+import { User } from '../types/user.type'
 interface LoginPayload {
   username: string
   password: string
 }
 class AuthService {
-  axios: any
+  axios: AxiosInstance
 
   constructor() {
     this.axios = axios.create({
       baseURL: `${import.meta.env.VITE_API_URL}/admin`
     })
 
-    this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
+    this.axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
-        config.headers = { Authorization: `Bearer ${storedToken}` }
+        if (config.headers instanceof AxiosHeaders) {
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        } else {
+          config.headers = new AxiosHeaders()
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        }
       }
 
       return config
@@ -40,6 +46,18 @@ class AuthService {
     return this.axios.get('/user', {
       headers: { Authorization: `Bearer ${token}` }
     })
+  }
+
+  requestChangePassword(email: string) {
+    return this.axios.post(`/change_password/request/${email}`)
+  }
+
+  changePassword(payload: { password: string; hash: string }) {
+    return this.axios.post(`/change_password/${payload.hash}`, payload.password)
+  }
+
+  updateUser(payload: Partial<User>) {
+    return this.axios.put('/update', payload)
   }
 }
 

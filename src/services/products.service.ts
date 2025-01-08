@@ -1,19 +1,24 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { Product } from '../types/product.type'
 
 class ProductService {
-  axios: any
+  axios: AxiosInstance
 
   constructor() {
     this.axios = axios.create({
       baseURL: `${import.meta.env.VITE_API_URL}/products`
     })
 
-    this.axios.interceptors.request.use((config: AxiosRequestConfig) => {
+    this.axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
 
       if (storedToken) {
-        config.headers = { Authorization: `Bearer ${storedToken}` }
+        if (config.headers instanceof AxiosHeaders) {
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        } else {
+          config.headers = new AxiosHeaders()
+          config.headers.set('Authorization', `Bearer ${storedToken}`)
+        }
       }
 
       return config

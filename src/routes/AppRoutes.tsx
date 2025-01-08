@@ -15,6 +15,9 @@ import { EditProductPage } from '../pages/dashboard/EditProductPage/EditProductP
 import { NewInvoicePage } from '../pages/dashboard/NewInvoicePage/NewInvoicePage'
 import { EachInvoice } from '../components/dashboard/EachInvoice/EachInvoice'
 import { SignaturePage } from '../pages/SignaturePage/SignaturePage'
+import { SettingsPage } from '../pages/SettingsPage/SettingsPage'
+import { ForgotPassword } from '../pages/ForgotPassword/ForgotPassword'
+import { ChangePassword } from '../pages/ChangePassword/ChangePassword'
 
 export const AppRoutes: React.FC = () => {
   const { isLoading } = useContext(AuthContext)
@@ -36,6 +39,9 @@ export const AppRoutes: React.FC = () => {
       <Route path="/invoices/new" element={<PrivateRoute element={<NewInvoicePage />} />} />
       <Route path="/invoices/sign" element={<SignaturePage />} />
       <Route path="/invoices/:invoiceId" element={<PrivateRoute element={<EachInvoice isDownload={false} />} />} />
+      <Route path="/settings" element={<PrivateRoute element={<SettingsPage />} />} />
+      <Route path="/forgot_password" element={<ForgotPassword />} />
+      <Route path="/change_password" element={<ChangePassword />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   )

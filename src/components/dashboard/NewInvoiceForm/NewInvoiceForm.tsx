@@ -40,7 +40,7 @@ export const NewInvoiceForm: React.FC = () => {
   const [isProductSelected, setIsProductSelected] = useState(false)
   const [productPrice, setProductPrice] = useState<number>(0)
   const [show, setShow] = useState(false)
-  const [signUrl, setSignUrl] = useState<string>('')
+  const [signUrl, setSignUrl] = useState<string | undefined>('')
   const { user } = useContext(AuthContext)
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export const NewInvoiceForm: React.FC = () => {
   }
 
   const uploadInvoicePdf = async (invoice: Invoice) => {
-    const pdfDocument = user && pdf(<EachInvoicePDF invoice={invoice} signUrl={signUrl} user={user} />)
+    const pdfDocument = user && pdf(<EachInvoicePDF invoice={invoice} signUrl={signUrl!} user={user} />)
     if (!pdfDocument) return
 
     const pdfBlob = await pdfDocument.toBlob()
@@ -366,7 +366,7 @@ export const NewInvoiceForm: React.FC = () => {
           </Button>
         </Modal>
 
-        <Button variant="primary" type="submit" disabled={!Boolean(signUrl)}>
+        <Button variant="primary" type="submit" disabled={!signUrl}>
           Crear factura
         </Button>
       </Form>

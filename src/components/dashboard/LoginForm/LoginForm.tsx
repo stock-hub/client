@@ -1,7 +1,8 @@
 import { useContext, useState } from 'react'
 import { AuthContext } from '../../../context/auth.context'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Button, Form } from 'react-bootstrap'
+import { ActionButtons, LoginFormError } from './LoginForm.styled'
 
 interface LoginFormFields {
   username: string
@@ -16,7 +17,7 @@ export const LoginForm: React.FC = () => {
 
   const navigate = useNavigate()
   const location = useLocation()
-  const { logInUser } = useContext(AuthContext)
+  const { logInUser, authError, showError } = useContext(AuthContext)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -37,30 +38,38 @@ export const LoginForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group className='mb-3' controlId='formBasicEmail'>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Username</Form.Label>
         <Form.Control
-          type='text'
-          name='username'
+          type="text"
+          name="username"
           value={loginFormFields.username}
           onChange={handleInputChange}
           required
         />
       </Form.Group>
 
-      <Form.Group className='mb-3' controlId='formBasicPassword'>
+      <Form.Group className="mb-3" controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
         <Form.Control
-          type='password'
-          name='password'
+          type="password"
+          name="password"
           value={loginFormFields.password}
           onChange={handleInputChange}
           required
         />
       </Form.Group>
-      <Button variant='primary' type='submit'>
-        Log in
-      </Button>
+      {showError && (
+        <LoginFormError>
+          <p>{authError}</p>
+        </LoginFormError>
+      )}
+      <ActionButtons>
+        <Button variant="primary" type="submit">
+          Log in
+        </Button>
+        <Link to="/forgot_password">¿Has olvidado tu contraseña?</Link>
+      </ActionButtons>
     </Form>
   )
 }
