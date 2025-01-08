@@ -53,7 +53,7 @@ class AuthService {
   }
 
   changePassword(payload: { password: string; hash: string }) {
-    return this.axios.post(`/change_password/${payload.hash}`, payload.password)
+    return this.axios.post(`/change_password/${payload.hash}`, { new_password: payload.password })
   }
 
   updateUser(payload: Partial<User>) {
