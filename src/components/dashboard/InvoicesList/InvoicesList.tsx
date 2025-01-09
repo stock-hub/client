@@ -19,6 +19,7 @@ export const InvoicesList: React.FC = () => {
   const [query] = useState<string>(searchParams.get('query') || '')
   const [isRentedCheck] = useState<boolean>(false)
   const { user } = useContext(AuthContext)
+  const [checkedButtons, setCheckedButtons] = useState<{ [key: string]: boolean }>({})
 
   const fetchInvoices = useCallback((page: number, query: string, isRented: boolean) => {
     invoiceService
@@ -71,6 +72,19 @@ export const InvoicesList: React.FC = () => {
       .catch((err: Error) => console.error(err))
   }
 
+  const sendByEmail = (invoiceId: string) => {
+    invoiceService
+      .sendByEmail(invoiceId)
+      .then(() => {
+        setCheckedButtons((prev) => ({ ...prev, [invoiceId]: true }))
+
+        setTimeout(() => {
+          setCheckedButtons((prev) => ({ ...prev, [invoiceId]: false }))
+        }, 2000)
+      })
+      .catch((err: Error) => console.error(err))
+  }
+
   return (
     <Container>
       {user &&
@@ -87,6 +101,13 @@ export const InvoicesList: React.FC = () => {
                 </Link>
                 <Button style={{ marginLeft: '1rem' }} onClick={() => downloadInvoice(invoice.invoiceId!)}>
                   Descargar PDF
+                </Button>
+                <Button
+                  style={{ marginLeft: '1rem' }}
+                  variant="success"
+                  onClick={() => sendByEmail(invoice.invoiceId!)}
+                >
+                  {checkedButtons[invoice.invoiceId!] ? <i className="fa-solid fa-check"></i> : 'Enviar por correo'}
                 </Button>
                 <Button
                   style={{ marginLeft: '1rem' }}

@@ -50,6 +50,10 @@ class InvoiceService {
   deleteInvoice(invoiceId: string) {
     return this.axios.delete(`/${invoiceId}/delete`)
   }
+
+  sendByEmail(invoiceId: string) {
+    return this.axios.post(`/${invoiceId}/send_email`)
+  }
 }
 
 const invoiceService = new InvoiceService()
