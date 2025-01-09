@@ -14,8 +14,8 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
     description: '',
     price: '' as unknown as number,
     imageUrl: [],
-    onSell: 'off',
-    inStock: 'off',
+    onSell: false,
+    inStock: false,
     tags: []
   })
 
@@ -38,9 +38,11 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
     const { name, value, checked } = e.target
 
     if (['onSell', 'inStock'].includes(name)) {
+      console.log('name', name)
+      console.log('checked', checked)
       setUpdatedProduct({
         ...updatedProduct,
-        [name]: checked ? 'on' : 'off'
+        [name]: checked
       })
     } else {
       setUpdatedProduct({
@@ -221,6 +223,7 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
         id="custom-switch"
         label="Producto en venta?"
         name="onSell"
+        checked={updatedProduct.onSell}
         onChange={handleInputChange}
       />
       <Form.Check
@@ -228,6 +231,7 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
         id="custom-switch"
         label="Producto en stock?"
         name="inStock"
+        checked={updatedProduct.inStock}
         onChange={handleInputChange}
       />
       <h6>Elegir etiquetas:</h6>

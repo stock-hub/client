@@ -5,8 +5,8 @@ export interface Product {
   price: number
   imageUrl: Array<string>
   tags: Array<string>
-  onSell: string
-  inStock: string
+  onSell: boolean
+  inStock: boolean
   user?: {
     _id?: string
     username: string

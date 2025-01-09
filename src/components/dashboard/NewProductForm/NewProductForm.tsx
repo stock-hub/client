@@ -59,8 +59,8 @@ export const NewProductForm: React.FC = () => {
     description: '',
     price: '' as unknown as number,
     imageUrl: [],
-    onSell: 'off',
-    inStock: 'off',
+    onSell: false,
+    inStock: false,
     tags: []
   })
 
@@ -75,7 +75,7 @@ export const NewProductForm: React.FC = () => {
     if (['onSell', 'inStock'].includes(name)) {
       setProduct({
         ...product,
-        [name]: checked ? 'on' : 'off'
+        [name]: checked
       })
     } else {
       setProduct({

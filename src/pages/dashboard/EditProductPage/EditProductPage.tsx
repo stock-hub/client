@@ -18,8 +18,8 @@ export const EditProductPage: React.FC = () => {
     price: '' as unknown as number,
     imageUrl: [],
     tags: [],
-    onSell: '',
-    inStock: ''
+    onSell: false,
+    inStock: false
   })
   const { productId } = useParams<RouteParams>()
 

@@ -19,8 +19,8 @@ export const ViewProductPage: React.FC = () => {
     price: '' as unknown as number,
     imageUrl: [],
     tags: [],
-    onSell: '',
-    inStock: ''
+    onSell: false,
+    inStock: false
   })
   const { productId } = useParams<RouteParams>()
   const onSell = product.onSell ? 'Producto en venta' : ''
