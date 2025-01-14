@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Product } from '../../../types/product.type'
 import productService from '../../../services/products.service'
 import { ViewProductImgs } from '../../../components/dashboard/ViewProductImgs/ViewProductImgs'
+import { formatAmount } from '../../../utils/tools'
 
 interface RouteParams {
   [key: string]: string | undefined
@@ -43,7 +44,7 @@ export const ViewProductPage: React.FC = () => {
         <br />
         <ViewProductImgs imgs={product.imageUrl} />
         <h1>{product.name}</h1>
-        <p>${product.price}</p>
+        <p>${formatAmount(product.price)}</p>
         <p>{onSell}</p>
         <p>{product.description}</p>
         <Link className="btn btn-outline-info" to={`/products/${product._id}/edit`}>

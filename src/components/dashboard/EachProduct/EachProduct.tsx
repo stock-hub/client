@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Product } from '../../../types/product.type'
 import productService from '../../../services/products.service'
 import { ActionLink, EachProductDiv, ProductImg } from './EachProduct.styled'
+import { formatAmount } from '../../../utils/tools'
 
 const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
           <p>
             <strong>{product.name}</strong>
           </p>
-          <p>${product.price}</p>
+          <p>${formatAmount(product.price)}</p>
           {product.tags.map((tag, idx) => {
             return (
               <p key={idx} className="AdminProductTag">
