@@ -121,7 +121,7 @@ export const NewProductForm: React.FC = () => {
     }
 
     cloudImagesService
-      .uploadImage(uploadData)
+      .uploadImages(uploadData)
       .then(({ data }: { data: { cloudinary_urls: Array<string> } }) => {
         const newImages = [...product.imageUrl, ...data.cloudinary_urls]
         setLoadingImage(false)

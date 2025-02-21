@@ -88,7 +88,7 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
     }
 
     try {
-      const { data } = await cloudImagesService.uploadImage(uploadData)
+      const { data } = await cloudImagesService.uploadImages(uploadData)
       const newImages = [...updatedProduct.imageUrl, ...data.cloudinary_urls]
       const imgDiff = newImages.filter((x) => !updatedProduct.imageUrl.includes(x))
 

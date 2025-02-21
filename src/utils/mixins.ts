@@ -1,4 +1,4 @@
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const MobileContainer = css`
   width: 90%;
@@ -26,4 +26,9 @@ export const PrimaryBtn = css`
     background-color: #a5a5a5;
     border-color: #a5a5a5;
   }
+`
+
+export const Img = styled.img`
+  width: 100%;
+  max-width: 600px;
 `

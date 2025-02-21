@@ -13,7 +13,7 @@ export interface User {
   nif: string
   tags: string[]
   invoiceTermsAndConditions: string
-  additionalData?: Record<string, any>
+  additionalData?: Record<string, unknown>
 }
 
 export interface Client {

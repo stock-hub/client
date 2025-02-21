@@ -24,6 +24,10 @@ class CloudImagesService {
     })
   }
 
+  uploadImages(imageForm: FormData) {
+    return this.axios.post('/upload_images', imageForm)
+  }
+
   uploadImage(imageForm: FormData) {
     return this.axios.post('/upload_image', imageForm)
   }

@@ -46,7 +46,8 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: s
         <View style={styles.divider}></View>
         <View style={styles.invoiceDetails}>
           <Text style={styles.invoiceDetailsText}>
-            Nº {user.additionalData?.invoice.hidden ? 'pedido' : 'factura'}: {invoice.invoiceId}
+            Nº {(user.additionalData?.invoice as Record<string, boolean>).hidden ? 'pedido' : 'factura'}:{' '}
+            {invoice.invoiceId}
           </Text>
           <Text style={styles.invoiceDetailsText}>Fecha: {formatDate(invoice.deliver)}</Text>
         </View>
