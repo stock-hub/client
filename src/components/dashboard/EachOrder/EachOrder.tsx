@@ -65,7 +65,7 @@ export const EachOrder: React.FC<{ isDownload: boolean }> = ({ isDownload = fals
             <b>Nº pedido:</b> {order.orderId}
           </p>
           <p>
-            <b>Fecha:</b> {formatDate(order.deliver)}
+            <b>Fecha:</b> {formatDate(order.deliver.toString(), true)}
           </p>
         </OrderDetails>
         <Divider />

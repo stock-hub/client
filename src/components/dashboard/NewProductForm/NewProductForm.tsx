@@ -5,53 +5,9 @@ import productService from '../../../services/products.service'
 import cloudImagesService from '../../../services/cloud_images.service'
 import { MessageContext } from '../../../context/userMessage.context'
 import { Product } from '../../../types/product.type'
-import styled from 'styled-components'
 import { AuthContext } from '../../../context/auth.context'
 import { titleize } from '../../../utils/tools'
-
-const NewProductTag = styled.span`
-  background-color: #d3d0d0;
-  padding: 3px 3px;
-  border-radius: 5px;
-  margin-right: 5px;
-`
-
-const ImagesPreview = styled.div`
-  display: flex;
-  justify-content: space-around;
-  margin: 2rem 0;
-
-  & > div {
-    padding: 10px;
-  }
-`
-
-const PicturePreview = styled.picture`
-  & img {
-    width: 10rem;
-    height: 10rem;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-`
-
-const DeleteImageBtn = styled.button`
-  background: none;
-  border: 2px solid red;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  color: red;
-  font-size: 1.5rem;
-  position: absolute;
-
-  & i {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: 5px;
-  }
-`
+import { DeleteImageBtn, ImagesPreview, NewProductTag, PicturePreview } from './NewProductForm.styled'
 
 export const NewProductForm: React.FC = () => {
   const [product, setProduct] = useState<Product>({
@@ -61,7 +17,9 @@ export const NewProductForm: React.FC = () => {
     imageUrl: [],
     onSell: false,
     inStock: false,
-    tags: []
+    tags: [],
+    quantity: 1,
+    maintenance: []
   })
 
   const [loadingImage, setLoadingImage] = useState(false)

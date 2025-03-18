@@ -136,8 +136,13 @@ export const SettingsPage: React.FC = () => {
                   <p>Haz click en un tag para eliminarlo.</p>
 
                   <Stack direction="horizontal" gap={2}>
-                    {userCopy.tags.map((tag) => (
-                      <Badge style={{ cursor: 'pointer' }} bg="dark" onClick={() => removeTag(tag, userCopy.tags)}>
+                    {userCopy.tags.map((tag, idx) => (
+                      <Badge
+                        key={idx}
+                        style={{ cursor: 'pointer' }}
+                        bg="dark"
+                        onClick={() => removeTag(tag, userCopy.tags)}
+                      >
                         {tag}
                       </Badge>
                     ))}

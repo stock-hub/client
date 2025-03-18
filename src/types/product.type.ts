@@ -1,3 +1,10 @@
+export interface Maintenance {
+  id: string
+  date: Date
+  description: string
+  personInCharge: string
+}
+
 export interface Product {
   _id?: string
   name: string
@@ -7,6 +14,8 @@ export interface Product {
   tags: Array<string>
   onSell: boolean
   inStock: boolean
+  quantity: number
+  maintenance?: Maintenance[]
   user?: {
     _id?: string
     username: string

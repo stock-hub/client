@@ -16,7 +16,8 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
     imageUrl: [],
     onSell: false,
     inStock: false,
-    tags: []
+    tags: [],
+    quantity: 0
   })
 
   useEffect(() => {
