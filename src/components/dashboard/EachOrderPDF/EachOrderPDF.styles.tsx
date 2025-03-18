@@ -34,16 +34,16 @@ export const pdfStyles = StyleSheet.create({
   companyAddress: {
     width: '100%'
   },
-  invoiceDetails: {
+  orderDetails: {
     flexDirection: 'row',
     width: '90%',
     padding: 10,
     marginHorizontal: 'auto'
   },
-  invoiceDetailsText: {
+  orderDetailsText: {
     marginRight: 20
   },
-  invoiceProducts: {
+  orderProducts: {
     width: '90%',
     margin: '0 auto',
     marginVertical: 10

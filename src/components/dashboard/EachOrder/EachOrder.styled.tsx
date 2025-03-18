@@ -53,7 +53,7 @@ export const CompanyAddress = styled.p`
   width: 100%;
 `
 
-export const InvoiceDetails = styled.div`
+export const OrderDetails = styled.div`
   width: 90%;
   margin: 0 auto;
   display: flex;
@@ -64,7 +64,7 @@ export const InvoiceDetails = styled.div`
   }
 `
 
-export const InvoiceProducts = styled.table`
+export const OrderProducts = styled.table`
   width: 90%;
   margin: 0 auto;
   border-collapse: collapse;

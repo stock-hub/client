@@ -88,14 +88,14 @@ export const AuthProviderWrapper = ({ children }: { children: React.ReactNode })
       }: LoginResponse = await authService.login({ username, password })
       storeToken(authToken)
       await authenticateUser()
-    } catch (err) {
-      if (err instanceof AxiosError && err.response) {
-        const { message } = err.response.data
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        const { message } = error.response.data
 
         setAuthError(message)
         setShowError(true)
       }
-      console.error(err)
+      console.error(error)
     } finally {
       setIsLoading(false)
     }

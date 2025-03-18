@@ -12,7 +12,7 @@ const EachProduct: React.FC<{ product: Product }> = ({ product }) => {
     productService
       .deleteProduct(productId)
       .then(() => navigate(0))
-      .catch((err: Error) => console.error(err))
+      .catch((error: Error) => console.error(error))
   }
 
   return (

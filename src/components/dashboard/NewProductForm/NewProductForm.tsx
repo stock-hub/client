@@ -130,8 +130,8 @@ export const NewProductForm: React.FC = () => {
           imageUrl: newImages
         })
       })
-      .catch((err: Error) => {
-        console.error(err)
+      .catch((error: Error) => {
+        console.error(error)
         if (product.imageUrl.length > 0) {
           setLoadingImage(false)
         }
@@ -176,9 +176,9 @@ export const NewProductForm: React.FC = () => {
     productService
       .newProduct(product)
       .then(() => navigate('/products?page=1'))
-      .catch((err: Error) => {
+      .catch((error: Error) => {
         setShowMessage(true)
-        setMessageInfo(err.message)
+        setMessageInfo(error.message)
       })
   }
 

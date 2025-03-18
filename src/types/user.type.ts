@@ -1,4 +1,4 @@
-import { Invoice } from './invoice.type'
+import { Order } from './order.type'
 import { Product } from './product.type'
 
 export interface User {
@@ -12,7 +12,7 @@ export interface User {
   address: string
   nif: string
   tags: string[]
-  invoiceTermsAndConditions: string
+  orderTermsAndConditions: string
   additionalData?: Record<string, unknown>
 }
 
@@ -26,5 +26,5 @@ export interface Client {
   imgUrl?: string
   boughtProducts?: Product[]
   rentedProducts?: Product[]
-  invoices?: Invoice[]
+  orders?: Order[]
 }

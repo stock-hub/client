@@ -6,7 +6,7 @@ import { UserMessage } from './components/UserMessage/UserMessage'
 import { AppRoutes } from './routes/AppRoutes'
 
 export const App: React.FC = () => {
-  const excludedRoutes = ['/', '/invoices/sign']
+  const excludedRoutes = ['/', '/orders/sign']
 
   return (
     <>

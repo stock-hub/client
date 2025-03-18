@@ -8,12 +8,12 @@ import { ProductsPage } from '../pages/dashboard/ProductsPage/ProductsPage'
 import { ViewProductPage } from '../pages/dashboard/ViewProductPage/ViewProductPage'
 import { HomePage } from '../pages/HomePage/HomePage'
 import { PageNotFound } from '../pages/PageNotFound/PageNotFound'
-import { InvoicesPage } from '../pages/dashboard/InvoicesPage/InvoicesPage'
+import { OrdersPage } from '../pages/dashboard/OrdersPage/OrdersPage'
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner'
 import PrivateRoute from '../components/PrivateRoute/PrivateRoute'
 import { EditProductPage } from '../pages/dashboard/EditProductPage/EditProductPage'
-import { NewInvoicePage } from '../pages/dashboard/NewInvoicePage/NewInvoicePage'
-import { EachInvoice } from '../components/dashboard/EachInvoice/EachInvoice'
+import { NewOrderPage } from '../pages/dashboard/NewOrderPage/NewOrderPage'
+import { EachOrder } from '../components/dashboard/EachOrder/EachOrder'
 import { SignaturePage } from '../pages/SignaturePage/SignaturePage'
 import { SettingsPage } from '../pages/SettingsPage/SettingsPage'
 import { ForgotPassword } from '../pages/ForgotPassword/ForgotPassword'
@@ -35,10 +35,10 @@ export const AppRoutes: React.FC = () => {
       <Route path="/products/new" element={<PrivateRoute element={<NewProductPage />} />} />
       <Route path="/products/:productId" element={<PrivateRoute element={<ViewProductPage />} />} />
       <Route path="/products/:productId/edit" element={<PrivateRoute element={<EditProductPage />} />} />
-      <Route path="/invoices" element={<PrivateRoute element={<InvoicesPage />} />} />
-      <Route path="/invoices/new" element={<PrivateRoute element={<NewInvoicePage />} />} />
-      <Route path="/invoices/sign" element={<SignaturePage />} />
-      <Route path="/invoices/:invoiceId" element={<PrivateRoute element={<EachInvoice isDownload={false} />} />} />
+      <Route path="/orders" element={<PrivateRoute element={<OrdersPage />} />} />
+      <Route path="/orders/new" element={<PrivateRoute element={<NewOrderPage />} />} />
+      <Route path="/orders/sign" element={<SignaturePage />} />
+      <Route path="/orders/:orderId" element={<PrivateRoute element={<EachOrder isDownload={false} />} />} />
       <Route path="/settings" element={<PrivateRoute element={<SettingsPage />} />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
       <Route path="/change_password" element={<ChangePassword />} />

@@ -1,9 +1,9 @@
 import { Document, Font, Image, Page, Text, View } from '@react-pdf/renderer'
 import React from 'react'
-import { Invoice } from '../../../types/invoice.type'
+import { Order } from '../../../types/order.type'
 import { User } from '../../../types/user.type'
 import { formatDate } from '../../../utils/tools'
-import { pdfStyles as styles } from './EachInvoicePDF.styles'
+import { pdfStyles as styles } from './EachOrderPDF.styles'
 import { Product } from '../../../types/product.type'
 
 Font.register({
@@ -14,11 +14,7 @@ Font.register({
   ]
 })
 
-export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: string }> = ({
-  invoice,
-  user,
-  signUrl
-}) => {
+export const EachOrderPDF: React.FC<{ order: Order; user: User; signUrl: string }> = ({ order, user, signUrl }) => {
   return (
     <Document>
       <Page size="A4" style={styles.container}>
@@ -37,29 +33,26 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: s
             <Text>{user.nif}</Text>
           </View>
           <View>
-            <Text>{invoice.clientName}</Text>
-            <Text>{invoice.clientId}</Text>
-            <Text>{invoice.clientAddress}</Text>
-            <Text>{invoice.clientTelephone}</Text>
+            <Text>{order.clientName}</Text>
+            <Text>{order.clientId}</Text>
+            <Text>{order.clientAddress}</Text>
+            <Text>{order.clientTelephone}</Text>
           </View>
         </View>
         <View style={styles.divider}></View>
-        <View style={styles.invoiceDetails}>
-          <Text style={styles.invoiceDetailsText}>
-            Nº {(user.additionalData?.invoice as Record<string, boolean>).hidden ? 'pedido' : 'factura'}:{' '}
-            {invoice.invoiceId}
-          </Text>
-          <Text style={styles.invoiceDetailsText}>Fecha: {formatDate(invoice.deliver)}</Text>
+        <View style={styles.orderDetails}>
+          <Text style={styles.orderDetailsText}>Nº pedido: {order.orderId}</Text>
+          <Text style={styles.orderDetailsText}>Fecha: {formatDate(order.deliver)}</Text>
         </View>
         <View style={styles.divider}></View>
-        <View style={styles.invoiceProducts}>
+        <View style={styles.orderProducts}>
           <View style={styles.tableHeader}>
             <Text style={styles.headerCell}>Cantidad</Text>
             <Text style={styles.headerCellWide}>Descripción</Text>
             <Text style={styles.headerCellSmall}>Precio</Text>
             <Text style={styles.headerCellSmallTotal}>Total</Text>
           </View>
-          {invoice.products.map((product, idx) => (
+          {order.products.map((product, idx) => (
             <View key={idx} style={styles.tableRow}>
               <Text style={styles.cell}>{product.quantity}</Text>
               <Text style={styles.cellWide}>{product.name}</Text>
@@ -71,12 +64,12 @@ export const EachInvoicePDF: React.FC<{ invoice: Invoice; user: User; signUrl: s
             <Text style={styles.cell}></Text>
             <Text style={styles.cellWide}></Text>
             <Text style={styles.cellSmall}></Text>
-            <Text style={styles.cellSmall}>$ {invoice.totalValue}</Text>
+            <Text style={styles.cellSmall}>$ {order.totalValue}</Text>
           </View>
         </View>
         <View style={styles.signature}>
           <Image source={signUrl} style={styles.signatureImage} />
-          <Text style={styles.signatureClientId}>{invoice.clientId}</Text>
+          <Text style={styles.signatureClientId}>{order.clientId}</Text>
         </View>
         <View style={styles.footer}>
           <View style={styles.divider}></View>

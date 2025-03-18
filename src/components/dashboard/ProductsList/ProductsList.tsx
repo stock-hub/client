@@ -33,7 +33,7 @@ export const ProductsList: React.FC = () => {
         setProductsList(data.products)
         setTotalPages(data.total_pages)
       })
-      .catch((err: Error) => console.error(err))
+      .catch((error: Error) => console.error(error))
   }, [])
 
   useEffect(() => {

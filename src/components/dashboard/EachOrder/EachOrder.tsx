@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
-import invoiceService from '../../../services/invoice.service'
-import { Invoice } from '../../../types/invoice.type'
+import orderService from '../../../services/order.service'
+import { Order } from '../../../types/order.type'
 import { formatDate } from '../../../utils/tools'
 import {
   CompanyAddress,
@@ -10,29 +10,29 @@ import {
   Divider,
   Footer,
   Header,
-  InvoiceDetails,
-  InvoiceProducts,
+  OrderDetails,
+  OrderProducts,
   UsersInfo
-} from './EachInvoice.styled'
+} from './EachOrder.styled'
 import { Product } from '../../../types/product.type'
 import { Button } from 'react-bootstrap'
 
-export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = false }) => {
+export const EachOrder: React.FC<{ isDownload: boolean }> = ({ isDownload = false }) => {
   const { user } = useContext(AuthContext)
-  const [invoice, setInvoice] = useState<Invoice | undefined>(undefined)
-  const { invoiceId } = useParams<string>()
+  const [order, setOrder] = useState<Order | undefined>(undefined)
+  const { orderId } = useParams<string>()
   const navigate = useNavigate()
 
   useEffect(() => {
-    invoiceService
-      .getInvoice(invoiceId as string)
-      .then(({ data }: { data: Invoice }) => setInvoice(data))
-      .catch((err: Error) => console.error(err))
-  }, [invoiceId])
+    orderService
+      .getOrder(orderId as string)
+      .then(({ data }: { data: Order }) => setOrder(data))
+      .catch((error: Error) => console.error(error))
+  }, [orderId])
 
   return (
     user &&
-    invoice && (
+    order && (
       <Container $download={isDownload}>
         <Button variant="outline-secondary" onClick={() => navigate(-1)}>
           Volver
@@ -53,24 +53,23 @@ export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = fa
             <p>{user.nif}</p>
           </div>
           <div>
-            <p>{invoice.clientName}</p>
-            <p>{invoice.clientId}</p>
-            <p>{invoice.clientAddress}</p>
-            <p>{invoice.clientTelephone}</p>
+            <p>{order.clientName}</p>
+            <p>{order.clientId}</p>
+            <p>{order.clientAddress}</p>
+            <p>{order.clientTelephone}</p>
           </div>
         </UsersInfo>
         <Divider />
-        <InvoiceDetails>
+        <OrderDetails>
           <p>
-            <b>Nº {(user.additionalData?.invoice as Record<string, boolean>).hidden ? 'pedido' : 'factura'}:</b>{' '}
-            {invoice.invoiceId}
+            <b>Nº pedido:</b> {order.orderId}
           </p>
           <p>
-            <b>Fecha:</b> {formatDate(invoice.deliver)}
+            <b>Fecha:</b> {formatDate(order.deliver)}
           </p>
-        </InvoiceDetails>
+        </OrderDetails>
         <Divider />
-        <InvoiceProducts>
+        <OrderProducts>
           <thead>
             <tr>
               <th>Cantidad</th>
@@ -80,7 +79,7 @@ export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = fa
             </tr>
           </thead>
           <tbody>
-            {invoice.products.map((product, idx) => {
+            {order.products.map((product, idx) => {
               const total = (product.product as Product).price * product.quantity
 
               return (
@@ -96,10 +95,10 @@ export const EachInvoice: React.FC<{ isDownload: boolean }> = ({ isDownload = fa
               <td></td>
               <td></td>
               <td></td>
-              <td>$ {invoice.totalValue}</td>
+              <td>$ {order.totalValue}</td>
             </tr>
           </tbody>
-        </InvoiceProducts>
+        </OrderProducts>
         <Divider />
         <Footer>
           <a href="cyrequiposyconstrucciones.com">cyrequiposyconstrucciones.com</a>

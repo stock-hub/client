@@ -99,8 +99,8 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
       setNewUploadedImgs(imgDiff)
 
       setLoadingImage(false)
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
       if (updatedProduct.imageUrl.length > 0) {
         setLoadingImage(false)
       }
@@ -152,9 +152,9 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
         deleteRemovedImages()
         navigate(`/products/${product._id}`)
       })
-      .catch((err: Error) => {
+      .catch((error: Error) => {
         setShowMessage(true)
-        setMessageInfo(err.message)
+        setMessageInfo(error.message)
       })
   }
 

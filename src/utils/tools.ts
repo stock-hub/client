@@ -19,7 +19,20 @@ export function formatDate(dateString?: string, form: boolean = false): string {
   return form ? `${year}-${month}-${day}` : `${day}/${month}/${year} ${hour}:${minutes}`
 }
 
-export function generateInvoiceId() {
+export function formatToDatetimeLocal(dateInput: string | Date) {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput)
+  const pad = (n: number) => n.toString().padStart(2, '0')
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+export function generateOrderId() {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let result = ''
   const bytes = new Uint8Array(9)

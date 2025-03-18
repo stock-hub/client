@@ -1,37 +1,42 @@
 import { pdf } from '@react-pdf/renderer'
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Col, Container, Dropdown, Form, Modal, Row, Table } from 'react-bootstrap'
+import { Button, Col, Container, Dropdown, Form, InputGroup, Modal, Row, Table } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
 import { MessageContext } from '../../../context/userMessage.context'
 import cloudFilesService from '../../../services/cloud_files.service'
-import invoiceService from '../../../services/invoice.service'
+import orderService from '../../../services/order.service'
 import productService from '../../../services/products.service'
-import { Invoice, InvoiceProduct, InvoiceSignatureResponse } from '../../../types/invoice.type'
+import { Order, OrderProduct, OrderSignatureResponse } from '../../../types/order.type'
 import { Product, ProductResponse } from '../../../types/product.type'
-import { formatDate, generateInvoiceId } from '../../../utils/tools'
+import { formatToDatetimeLocal, generateOrderId } from '../../../utils/tools'
 import { QRSignature } from '../../QRSignature/QRSignature'
-import { EachInvoicePDF } from '../EachInvoicePDF/EachInvoicePDF'
+import { EachOrderPDF } from '../EachOrderPDF/EachOrderPDF'
+import clientService from '../../../services/client.service'
+import { Client } from '../../../types/client.type'
 
-export const NewInvoiceForm: React.FC = () => {
-  const [invoiceId] = useState(generateInvoiceId())
-  const [invoice, setInvoice] = useState<Invoice>({
+export const NewOrderForm: React.FC = () => {
+  const [orderId] = useState(generateOrderId())
+  const [order, setOrder] = useState<Order>({
     products: [],
     totalValue: 0,
-    deliver: new Date().toString(),
+    deliver: new Date(),
     clientName: '',
     clientAddress: '',
     clientId: '',
     clientEmail: '',
     clientTelephone: undefined as unknown as number,
-    invoiceId
+    orderId
   })
-  const [invoiceProduct, setInvoiceProduct] = useState<InvoiceProduct>({
+  const [orderProduct, setOrderProduct] = useState<OrderProduct>({
     product: '',
     name: '',
-    quantity: 1
+    quantity: 1,
+    location: ''
   })
-  const [invoiceProducts, setInvoiceProducts] = useState<InvoiceProduct[]>([])
+  const [orderProducts, setOrderProducts] = useState<OrderProduct[]>([])
+  const [client, setClient] = useState<Client | undefined>(undefined)
+  const [clientNotFound, setClientNotFound] = useState(false)
   const navigate = useNavigate()
   const { setShowMessage, setMessageInfo } = useContext(MessageContext)
   const [searchProductQuery, setSearchProductQuery] = useState('')
@@ -40,6 +45,7 @@ export const NewInvoiceForm: React.FC = () => {
   const [isProductSelected, setIsProductSelected] = useState(false)
   const [productPrice, setProductPrice] = useState<number>(0)
   const [show, setShow] = useState(false)
+  const [showClientModal, setShowClientModal] = useState(false)
   const [signUrl, setSignUrl] = useState<string | undefined>('')
   const { user } = useContext(AuthContext)
 
@@ -64,33 +70,58 @@ export const NewInvoiceForm: React.FC = () => {
         .then(({ data }: { data: ProductResponse }) => {
           setProducts(data)
         })
-        .catch((err: Error) => {
+        .catch((error: Error) => {
           setShowMessage(true)
-          setMessageInfo(err.message)
+          setMessageInfo(error.message)
         })
     } else {
       setProducts([])
     }
-  }, [debouncedProductQuery, isProductSelected])
+  }, [debouncedProductQuery, isProductSelected, setMessageInfo, setShowMessage])
+
+  const getClient = (dni: string) => {
+    clientService
+      .getClient(dni)
+      .then(({ data }: { data: Client }) => {
+        if (!data) {
+          setClientNotFound(true)
+        } else {
+          setClient(data)
+          setShowClientModal(true)
+          setClientNotFound(false)
+        }
+      })
+      .catch((error: Error) => {
+        setShowMessage(true)
+        setMessageInfo(error.message)
+      })
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
     if (['deliver'].includes(name)) {
-      setInvoice((prevInvoice) => ({
-        ...prevInvoice,
+      setOrder((prevOrder) => ({
+        ...prevOrder,
         [name]: new Date(value)
       }))
-    } else if (['quantity', 'valuePerDay', 'return', 'deposit'].includes(name)) {
-      setInvoiceProduct((prevProduct) => ({
-        ...prevProduct,
-        [name]: value
-      }))
+    } else if (['quantity', 'valuePerDay', 'return', 'deposit', 'location'].includes(name)) {
+      if (name === 'return') {
+        setOrderProduct((prevProduct) => ({
+          ...prevProduct,
+          [name]: new Date(value)
+        }))
+      } else {
+        setOrderProduct((prevProduct) => ({
+          ...prevProduct,
+          [name]: value
+        }))
+      }
     } else if (name === 'product') {
       setSearchProductQuery(value)
       setIsProductSelected(false)
     } else {
-      setInvoice((prevState) => ({
+      setOrder((prevState) => ({
         ...prevState,
         [name]: value
       }))
@@ -98,7 +129,7 @@ export const NewInvoiceForm: React.FC = () => {
   }
 
   const handleProductSelect = (product: Product) => {
-    setInvoiceProduct((prevProduct) => ({
+    setOrderProduct((prevProduct) => ({
       ...prevProduct,
       product: product._id!,
       name: product.name
@@ -110,13 +141,13 @@ export const NewInvoiceForm: React.FC = () => {
   }
 
   const handleAddNewProduct = () => {
-    const total = productPrice * invoiceProduct.quantity
-    setInvoiceProducts((prevProducts) => [...prevProducts, invoiceProduct])
-    setInvoice((prevState) => ({
+    const total = productPrice * orderProduct.quantity
+    setOrderProducts((prevProducts) => [...prevProducts, orderProduct])
+    setOrder((prevState) => ({
       ...prevState,
       totalValue: prevState.totalValue + total
     }))
-    setInvoiceProduct({
+    setOrderProduct({
       product: '',
       quantity: 1,
       name: '',
@@ -131,57 +162,69 @@ export const NewInvoiceForm: React.FC = () => {
     setIsProductSelected(false)
   }
 
-  const uploadInvoicePdf = async (invoice: Invoice) => {
-    const pdfDocument = user && pdf(<EachInvoicePDF invoice={invoice} signUrl={signUrl!} user={user} />)
+  const uploadOrderPdf = async (order: Order) => {
+    const pdfDocument = user && pdf(<EachOrderPDF order={order} signUrl={signUrl!} user={user} />)
     if (!pdfDocument) return
 
     const pdfBlob = await pdfDocument.toBlob()
 
     const formData = new FormData()
     formData.append('file', pdfBlob)
-    formData.append('fileId', invoice.invoiceId!)
+    formData.append('fileId', order.orderId!)
 
-    cloudFilesService.uploadFile(formData).catch((err: Error) => {
+    cloudFilesService.uploadFile(formData).catch((error: Error) => {
       setShowMessage(true)
-      setMessageInfo(err.message)
+      setMessageInfo(error.message)
     })
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    const updatedInvoice = {
-      ...invoice,
-      products: invoiceProducts.length ? invoiceProducts : [invoiceProduct],
-      ...(!invoiceProducts.length && { totalValue: productPrice * invoiceProduct.quantity })
+    const updatedOrder = {
+      ...order,
+      products: orderProducts.length ? orderProducts : [orderProduct],
+      ...(!orderProducts.length && { totalValue: productPrice * orderProduct.quantity })
     }
 
-    setInvoice(updatedInvoice)
+    setOrder(updatedOrder)
 
-    invoiceService
-      .newInvoice(updatedInvoice)
-      .then(({ data }: { data: Invoice }) => {
-        uploadInvoicePdf(data)
-        navigate('/invoices')
+    orderService
+      .newOrder(updatedOrder)
+      .then(({ data }: { data: Order }) => {
+        uploadOrderPdf(data)
+        navigate('/orders')
       })
-      .catch((err: Error) => {
+      .catch((error: Error) => {
         setShowMessage(true)
-        setMessageInfo(err.message)
+        setMessageInfo(error.message)
       })
   }
 
   const handleClose = () => {
     setShow(false)
 
-    invoiceService
-      .getSignature(invoiceId)
-      .then(({ data }: InvoiceSignatureResponse) => {
+    orderService
+      .getSignature(orderId)
+      .then(({ data }: OrderSignatureResponse) => {
         setSignUrl(data.signature)
       })
-      .catch((err: Error) => {
+      .catch((error: Error) => {
         setShowMessage(true)
-        setMessageInfo(err.message)
+        setMessageInfo(error.message)
       })
+  }
+
+  const fillExistingClientData = (clientData: Client | undefined) => {
+    setOrder((prevOrder) => ({
+      ...prevOrder,
+      ...(clientData?.name && { clientName: clientData.name }),
+      ...(clientData?.address && { clientAddress: clientData.address }),
+      ...(clientData?.dni && { clientId: clientData.dni }),
+      ...(clientData?.email && { clientEmail: clientData.email }),
+      ...(clientData?.phone && { clientTelephone: clientData.phone })
+    }))
+    setShowClientModal(false)
   }
 
   const handleShow = () => setShow(true)
@@ -192,13 +235,7 @@ export const NewInvoiceForm: React.FC = () => {
         <h5>Datos del cliente</h5>
         <Form.Group className="mb-3">
           <Form.Label>Nombre</Form.Label>
-          <Form.Control
-            type="text"
-            name="clientName"
-            value={invoice.clientName}
-            onChange={handleInputChange}
-            required
-          />
+          <Form.Control type="text" name="clientName" value={order.clientName} onChange={handleInputChange} required />
         </Form.Group>
         <Row>
           <Col md={6}>
@@ -207,7 +244,7 @@ export const NewInvoiceForm: React.FC = () => {
               <Form.Control
                 type="text"
                 name="clientAddress"
-                value={invoice.clientAddress}
+                value={order.clientAddress}
                 onChange={handleInputChange}
                 required
               />
@@ -216,13 +253,25 @@ export const NewInvoiceForm: React.FC = () => {
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Documento de Identidad</Form.Label>
-              <Form.Control
-                type="text"
-                name="clientId"
-                value={invoice.clientId}
-                onChange={handleInputChange}
-                required
-              />
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  name="clientId"
+                  value={order.clientId}
+                  onChange={handleInputChange}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline-secondary"
+                  id="button-addon2"
+                  disabled={!order.clientId}
+                  onClick={() => getClient(order.clientId)}
+                >
+                  Buscar cliente
+                </Button>
+              </InputGroup>
+              {clientNotFound && <p className="text-danger">Cliente no encontrado</p>}
             </Form.Group>
           </Col>
         </Row>
@@ -233,7 +282,7 @@ export const NewInvoiceForm: React.FC = () => {
               <Form.Control
                 type="email"
                 name="clientEmail"
-                value={invoice.clientEmail}
+                value={order.clientEmail}
                 onChange={handleInputChange}
                 required
               />
@@ -245,12 +294,23 @@ export const NewInvoiceForm: React.FC = () => {
               <Form.Control
                 type="tel"
                 name="clientTelephone"
-                value={invoice.clientTelephone || ''}
+                value={order.clientTelephone || ''}
                 onChange={handleInputChange}
                 required
               />
             </Form.Group>
           </Col>
+        </Row>
+        <Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Observaciones</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="clientObservation"
+              value={order.clientObservation || ''}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
         </Row>
         <hr />
         <h5>Datos del producto</h5>
@@ -263,7 +323,7 @@ export const NewInvoiceForm: React.FC = () => {
                 name="product"
                 value={searchProductQuery}
                 onChange={handleInputChange}
-                required={invoiceProducts.length ? false : invoiceProduct.product ? false : true}
+                required={orderProducts.length ? false : orderProduct.product ? false : true}
               />
             </Form.Group>
             {products.length > 0 && (
@@ -285,11 +345,11 @@ export const NewInvoiceForm: React.FC = () => {
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Fecha de entrega</Form.Label>
+              <Form.Label>Fecha y hora de entrega</Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="deliver"
-                value={formatDate(invoice.deliver, true)}
+                value={order.deliver ? formatToDatetimeLocal(order.deliver) : ''}
                 onChange={handleInputChange}
                 required
               />
@@ -304,7 +364,7 @@ export const NewInvoiceForm: React.FC = () => {
                 type="number"
                 name="quantity"
                 min="1"
-                value={invoiceProduct.quantity}
+                value={orderProduct.quantity}
                 onChange={handleInputChange}
                 required
               />
@@ -316,7 +376,7 @@ export const NewInvoiceForm: React.FC = () => {
               <Form.Control
                 type="number"
                 name="deposit"
-                value={invoiceProduct.deposit || ''}
+                value={orderProduct.deposit || ''}
                 onChange={handleInputChange}
               />
             </Form.Group>
@@ -325,11 +385,11 @@ export const NewInvoiceForm: React.FC = () => {
         <Row>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Fecha de devolución</Form.Label>
+              <Form.Label>Fecha y hora de devolución</Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="return"
-                value={formatDate(invoiceProduct.return, true)}
+                value={orderProduct.return ? formatToDatetimeLocal(orderProduct.return) : ''}
                 onChange={handleInputChange}
               />
             </Form.Group>
@@ -341,39 +401,50 @@ export const NewInvoiceForm: React.FC = () => {
                 type="number"
                 name="valuePerDay"
                 min="0"
-                value={invoiceProduct.valuePerDay || ''}
+                value={orderProduct.valuePerDay || ''}
                 onChange={handleInputChange}
               />
             </Form.Group>
           </Col>
+        </Row>
+        <Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Ubicación del producto</Form.Label>
+            <Form.Control
+              type="text"
+              name="location"
+              value={orderProduct.location || ''}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
         </Row>
         <br />
         {signUrl && <img src={signUrl} alt="Signature" />}
         <br />
         <br />
         <Button variant="success" style={{ marginRight: '1rem' }} onClick={handleAddNewProduct}>
-          Añadir nuevo producto a factura
+          Añadir nuevo producto al pedido
         </Button>
         {!signUrl && (
           <Button variant="secondary" style={{ marginRight: '1rem' }} onClick={handleShow}>
-            Firmar factura
+            Firmar pedido
           </Button>
         )}
         <Modal show={show} onHide={handleShow}>
-          {user && <QRSignature invoiceId={invoiceId} terms={user.invoiceTermsAndConditions} />}
+          {user && <QRSignature orderId={orderId} terms={user.orderTermsAndConditions} />}
           <Button style={{ width: '90%', margin: '1rem auto' }} variant="secondary" onClick={handleClose}>
             Cerrar
           </Button>
         </Modal>
 
         <Button variant="primary" type="submit" disabled={!signUrl}>
-          Crear factura
+          Crear pedido
         </Button>
       </Form>
 
       <br />
 
-      {invoiceProducts.length > 0 && (
+      {orderProducts.length > 0 && (
         <Table striped bordered>
           <thead>
             <tr>
@@ -387,7 +458,7 @@ export const NewInvoiceForm: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {invoiceProducts.map((product, idx) => {
+            {orderProducts.map((product, idx) => {
               return (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
@@ -395,7 +466,7 @@ export const NewInvoiceForm: React.FC = () => {
                   <td>{product.quantity}</td>
                   <td>{product.valuePerDay || '-'}</td>
                   <td>{product.deposit || '-'}</td>
-                  <td>{product.return || '-'}</td>
+                  <td>{product.return?.toISOString() || '-'}</td>
                   {/* <td>
                     <Button variant="danger">Borrar</Button> // TODO: Add logic to remove product
                   </td> */}
@@ -407,6 +478,35 @@ export const NewInvoiceForm: React.FC = () => {
       )}
 
       <br />
+
+      <Modal show={showClientModal} onHide={() => setShowClientModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cliente ya registrado</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <p>Nombre: {client?.name}</p>
+            <p>Domicilio: {client?.address}</p>
+            <p>Documento de Identidad: {client?.dni}</p>
+            <p>Correo electrónico: {client?.email}</p>
+            <p>Teléfono: {client?.phone}</p>
+            <p>Observaciones:</p>
+            <ul>
+              {client?.observations?.map((observation, idx) => (
+                <li key={idx}>{observation}</li>
+              ))}
+            </ul>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowClientModal(false)}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={() => fillExistingClientData(client)}>
+            Rellenar datos
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   )
 }

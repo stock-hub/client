@@ -38,8 +38,8 @@ export const NavBar: React.FC = () => {
                 <Nav.Link as={NavLink} to="/products?page=1">
                   Productos
                 </Nav.Link>
-                <Nav.Link as={NavLink} to="/invoices">
-                  Facturas
+                <Nav.Link as={NavLink} to="/orders">
+                  Pedidos
                 </Nav.Link>
               </>
             )}

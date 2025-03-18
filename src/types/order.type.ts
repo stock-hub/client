@@ -1,33 +1,35 @@
 import { Product } from './product.type'
 import { User } from './user.type'
 
-export interface InvoiceProduct {
+export interface OrderProduct {
   product: string | Product
   name: string
   quantity: number
   valuePerDay?: number
-  return?: string
+  return?: Date
   deposit?: number
+  location?: string
 }
 
-export interface Invoice {
+export interface Order {
   _id?: string
   user?: User
-  products: InvoiceProduct[]
+  products: OrderProduct[]
   totalValue: number
-  deliver: string
+  deliver: Date
   clientName: string
   clientAddress: string
   clientId: string
   clientEmail: string
   clientTelephone: number
   clientSignature?: string
-  invoiceId?: string
+  clientObservation?: string
+  orderId?: string
   createdAt?: string
   updatedAt?: string
 }
 
-export interface InvoiceSignatureResponse {
+export interface OrderSignatureResponse {
   data: {
     signature: string
   }

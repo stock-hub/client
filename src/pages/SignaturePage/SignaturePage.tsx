@@ -4,11 +4,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import SignatureCanvas from 'react-signature-canvas'
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner'
 import { MessageContext } from '../../context/userMessage.context'
-import invoiceService from '../../services/invoice.service'
+import orderService from '../../services/order.service'
 
 export const SignaturePage: React.FC = () => {
   const [searchParams] = useSearchParams()
-  const invoiceId = searchParams.get('invoiceId')
+  const orderId = searchParams.get('orderId')
   const terms = searchParams.get('data')
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
@@ -26,7 +26,7 @@ export const SignaturePage: React.FC = () => {
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined
 
-    if (!invoiceId) {
+    if (!orderId) {
       timer = setTimeout(() => {
         navigate('/login')
       }, 3000)
@@ -39,7 +39,7 @@ export const SignaturePage: React.FC = () => {
         clearTimeout(timer)
       }
     }
-  }, [invoiceId, navigate])
+  }, [orderId, navigate])
 
   useEffect(() => {
     const updateCanvasWidth = () => {
@@ -70,19 +70,19 @@ export const SignaturePage: React.FC = () => {
     if (sigCanvas.current) {
       const signatureImage = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png')
 
-      invoiceService
-        .newSignature(invoiceId!, signatureImage)
+      orderService
+        .newSignature(orderId!, signatureImage)
         .then(() => navigate('/'))
-        .catch((err: Error) => {
+        .catch((error: Error) => {
           setShowMessage(true)
-          setMessageInfo(err.message)
+          setMessageInfo(error.message)
         })
     }
   }
 
   return (
     <Container ref={containerRef} style={{ maxHeight: '100vh' }}>
-      <h1>Firmar factura {invoiceId}</h1>
+      <h1>Firmar pedido {orderId}</h1>
       {conditionsAccepted ? (
         <>
           <div style={{ width: '100%', border: '1px solid black' }}>
