@@ -88,6 +88,14 @@ export const SettingsPage: React.FC = () => {
     const employeesIds: string[] = updatedEmployees.map((employee) => employee._id!)
 
     await updateUser({ employees: [...(employeesIds || []), newEmployee.data._id!] })
+
+    setEmployee({
+      name: '',
+      email: '',
+      phone: 0,
+      role: ROLES.EMPLOYEE,
+      user: user!
+    })
   }
 
   const handleEmployeeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
