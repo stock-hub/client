@@ -1,17 +1,6 @@
+import { Employee } from './employee.type'
 import { Order } from './order.type'
 import { Product } from './product.type'
-
-enum ROLES {
-  ADMIN = 'ADMIN',
-  EMPLOYEE = 'EMPLOYEE'
-}
-
-export interface Employee {
-  name: string
-  phone: number
-  email: string
-  role: ROLES
-}
 
 export interface User {
   _id: string
@@ -26,7 +15,7 @@ export interface User {
   tags: string[]
   orderTermsAndConditions: string
   additionalData?: Record<string, unknown>
-  employees?: Employee[]
+  employees?: Employee[] | string[]
 }
 
 export interface Client {

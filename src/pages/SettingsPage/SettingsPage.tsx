@@ -1,12 +1,14 @@
 import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SettingsOptions } from './SettingsPage.styled'
-import { Button, Form, ListGroup, Row, Col, Stack, Badge } from 'react-bootstrap'
+import { Button, Form, ListGroup, Row, Col, Stack, Badge, Table } from 'react-bootstrap'
 import { AuthContext } from '../../context/auth.context'
 import { User } from '../../types/user.type'
 import authService from '../../services/auth.service'
 import cloudImagesService from '../../services/cloud_images.service'
 import { Img } from '../../utils/mixins'
+import { Employee, ROLES } from '../../types/employee.type'
+import employeeService from '../../services/employee.service'
 
 export const SettingsPage: React.FC = () => {
   const [showTags, setShowTags] = useState<boolean>(false)
@@ -15,6 +17,14 @@ export const SettingsPage: React.FC = () => {
   const [userCopy, setUserCopy] = useState<User | null>(user)
   const [newTag, setNewTag] = useState<string>('')
   const [uploadData, setUploadData] = useState<FormData | null>()
+  const [showEmployees, setShowEmployees] = useState<boolean>(false)
+  const [employee, setEmployee] = useState<Employee>({
+    name: '',
+    email: '',
+    phone: 0,
+    role: ROLES.EMPLOYEE,
+    user: user!
+  })
 
   const updateUser = async (updates: Partial<User>) => {
     await authService.updateUser(updates)
@@ -64,6 +74,34 @@ export const SettingsPage: React.FC = () => {
     setUserCopy((prev) => prev && { ...prev, logoUrl: data.cloudinary_url })
 
     await updateUser({ logoUrl: data.cloudinary_url })
+  }
+
+  const addEmployee = async (employees: Employee[], e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const updatedEmployees = [...(employees || []), employee]
+
+    const newEmployee = await employeeService.newEmployee(employee)
+
+    setUserCopy((prev) => prev && { ...prev, employees: updatedEmployees })
+
+    const employeesIds: string[] = updatedEmployees.map((employee) => employee._id!)
+
+    await updateUser({ employees: [...(employeesIds || []), newEmployee.data._id!] })
+  }
+
+  const handleEmployeeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmployee({ ...employee, [e.target.name]: e.target.value })
+  }
+
+  const removeEmployee = async (employee: Employee, employees: Employee[]) => {
+    const filteredEmployees = employees.filter((e) => e.name !== employee.name)
+
+    setUserCopy((prev) => prev && { ...prev, employees: filteredEmployees })
+
+    await updateUser({ employees: filteredEmployees })
+
+    await employeeService.deleteEmployee(employee._id!)
   }
 
   return (
@@ -147,6 +185,108 @@ export const SettingsPage: React.FC = () => {
                       </Badge>
                     ))}
                   </Stack>
+                </div>
+              </>
+            )}
+          </ListGroup.Item>
+
+          <ListGroup.Item>
+            <Button variant="outline-secondary" type="button" onClick={() => setShowEmployees((prev) => !prev)}>
+              Añadir/Eliminar empleados
+            </Button>
+
+            {showEmployees && (
+              <>
+                <br />
+                <br />
+                <h4>Rellena los campos para añadir un empleado</h4>
+                <br />
+                <div>
+                  <Form onSubmit={(e) => addEmployee(userCopy.employees as Employee[], e)}>
+                    <Row>
+                      <Col md={2}>
+                        <Form.Control
+                          type="text"
+                          name="name"
+                          autoComplete="off"
+                          required
+                          placeholder="Nombre del empleado"
+                          value={employee.name}
+                          onChange={handleEmployeeInputChange}
+                        />
+                      </Col>
+                      <Col md={2}>
+                        <Form.Control
+                          type="email"
+                          name="email"
+                          autoComplete="off"
+                          required
+                          placeholder="Email"
+                          value={employee.email}
+                          onChange={handleEmployeeInputChange}
+                        />
+                      </Col>
+                      <Col md={2}>
+                        <Form.Control
+                          type="number"
+                          name="phone"
+                          required
+                          placeholder="Teléfono"
+                          autoComplete="off"
+                          value={employee.phone === 0 ? '' : employee.phone}
+                          onChange={handleEmployeeInputChange}
+                        />
+                      </Col>
+                      <Col md={2}>
+                        <Form.Select
+                          name="role"
+                          required
+                          onChange={(e) => setEmployee({ ...employee, role: e.target.value as ROLES })}
+                        >
+                          <option disabled selected={true}>
+                            Selecciona un rol
+                          </option>
+                          <option value={ROLES.EMPLOYEE}>Empleado</option>
+                          <option value={ROLES.ADMIN}>Administrador</option>
+                        </Form.Select>
+                      </Col>
+                      <Col md={2}>
+                        <Button variant="primary" type="submit">
+                          Añadir
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form>
+                  <br />
+                  <br />
+                  <Table striped bordered>
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(userCopy.employees as Employee[])?.map((employee, idx) => (
+                        <tr key={idx}>
+                          <td>{employee.name}</td>
+                          <td>{employee.email}</td>
+                          <td>{employee.phone}</td>
+                          <td>{employee.role}</td>
+                          <td>
+                            <Button
+                              variant="danger"
+                              onClick={() => removeEmployee(employee, userCopy.employees as Employee[])}
+                            >
+                              Eliminar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
                 </div>
               </>
             )}

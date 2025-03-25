@@ -6,7 +6,7 @@ import productService from '../../../services/products.service'
 import { ViewProductImgs } from '../../../components/dashboard/ViewProductImgs/ViewProductImgs'
 import { formatAmount, formatDate } from '../../../utils/tools'
 import { AuthContext } from '../../../context/auth.context'
-import { Employee } from '../../../types/user.type'
+import { Employee } from '../../../types/employee.type'
 import maintenanceService from '../../../services/maintenance.service'
 import { Maintenance } from '../../../types/maintenance.type'
 
@@ -273,6 +273,7 @@ export const ViewProductPage: React.FC = () => {
                   placeholder="Fecha"
                   value={formatDate(maintenance.date.toString(), true)}
                   name="date"
+                  required
                   onChange={handleInputChange}
                 />
               </Form.Group>
@@ -283,6 +284,7 @@ export const ViewProductPage: React.FC = () => {
                   rows={3}
                   placeholder="Descripción"
                   name="description"
+                  required
                   value={maintenance.description}
                   onChange={handleInputChange}
                 />
@@ -293,6 +295,7 @@ export const ViewProductPage: React.FC = () => {
                   type="text"
                   autoComplete="off"
                   name="personInCharge"
+                  required
                   value={maintenance.personInCharge}
                   onChange={handleInputChange}
                 />
@@ -306,7 +309,7 @@ export const ViewProductPage: React.FC = () => {
                     overflowY: 'auto'
                   }}
                 >
-                  {user.employees
+                  {(user.employees as Employee[])
                     .filter((employee) =>
                       employee.name.toLowerCase().includes(maintenance.personInCharge.toLowerCase())
                     )
@@ -345,6 +348,7 @@ export const ViewProductPage: React.FC = () => {
                   placeholder="Fecha"
                   value={formatDate(maintenanceToEdit.date.toString(), true)}
                   name="date"
+                  required
                   onChange={handleEditMaintenanceInputChange}
                 />
               </Form.Group>
@@ -356,6 +360,7 @@ export const ViewProductPage: React.FC = () => {
                   placeholder="Descripción"
                   name="description"
                   value={maintenanceToEdit.description}
+                  required
                   onChange={handleEditMaintenanceInputChange}
                 />
               </Form.Group>
@@ -366,6 +371,7 @@ export const ViewProductPage: React.FC = () => {
                   autoComplete="off"
                   name="personInCharge"
                   value={maintenanceToEdit.personInCharge}
+                  required
                   onChange={handleEditMaintenanceInputChange}
                 />
               </Form.Group>
@@ -382,7 +388,7 @@ export const ViewProductPage: React.FC = () => {
                       overflowY: 'auto'
                     }}
                   >
-                    {user.employees
+                    {(user.employees as Employee[])
                       .filter((employee) =>
                         employee.name.toLowerCase().includes(maintenanceToEdit.personInCharge.toLowerCase())
                       )
