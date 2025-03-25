@@ -1,9 +1,5 @@
-export interface Maintenance {
-  id: string
-  date: Date
-  description: string
-  personInCharge: string
-}
+import { Maintenance } from './maintenance.type'
+import { User } from './user.type'
 
 export interface Product {
   _id?: string
@@ -15,20 +11,8 @@ export interface Product {
   onSell: boolean
   inStock: boolean
   quantity: number
-  maintenance?: Maintenance[]
-  user?: {
-    _id?: string
-    username: string
-    password: string
-    logoUrl: string
-    companyName: string
-    phone: number
-    address: string
-    nif: string
-    tags: string[]
-    createdAt: Date
-    updatedAt: Date
-  }
+  maintenance?: Maintenance[] | string[]
+  user?: User
   createdAt?: Date
   updatedAt?: Date
 }
