@@ -13,7 +13,7 @@ import employeeService from '../../services/employee.service'
 export const SettingsPage: React.FC = () => {
   const [showTags, setShowTags] = useState<boolean>(false)
   const [showProfileImg, setProfileImg] = useState<boolean>(false)
-  const { user } = useContext(AuthContext)
+  const { user, authenticateUser } = useContext(AuthContext)
   const [userCopy, setUserCopy] = useState<User | null>(user)
   const [newTag, setNewTag] = useState<string>('')
   const [uploadData, setUploadData] = useState<FormData | null>()
@@ -88,6 +88,8 @@ export const SettingsPage: React.FC = () => {
     const employeesIds: string[] = updatedEmployees.map((employee) => employee._id!)
 
     await updateUser({ employees: [...(employeesIds || []), newEmployee.data._id!] })
+
+    await authenticateUser()
 
     setEmployee({
       name: '',
