@@ -4,23 +4,30 @@ import { Button, Col, Container, Dropdown, Form, InputGroup, Modal, Row, Table }
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
 import { MessageContext } from '../../../context/userMessage.context'
+import clientService from '../../../services/client.service'
 import cloudFilesService from '../../../services/cloud_files.service'
 import orderService from '../../../services/order.service'
 import productService from '../../../services/products.service'
+import { Client } from '../../../types/client.type'
 import { Order, OrderProduct, OrderSignatureResponse } from '../../../types/order.type'
 import { Product, ProductResponse } from '../../../types/product.type'
-import { formatToDatetimeLocal, generateOrderId } from '../../../utils/tools'
+import {
+  calculateTotalValue,
+  diffDays,
+  formatAmount,
+  formatDate,
+  formatToDatetimeLocal,
+  generateOrderId
+} from '../../../utils/tools'
 import { QRSignature } from '../../QRSignature/QRSignature'
 import { EachOrderPDF } from '../EachOrderPDF/EachOrderPDF'
-import clientService from '../../../services/client.service'
-import { Client } from '../../../types/client.type'
+import GoogleMaps, { LocationData } from '../../GoogleMaps/GoogleMaps'
 
 export const NewOrderForm: React.FC = () => {
   const [orderId] = useState(generateOrderId())
   const [order, setOrder] = useState<Order>({
     products: [],
     totalValue: 0,
-    deliver: new Date(),
     clientName: '',
     clientAddress: '',
     clientId: '',
@@ -29,8 +36,10 @@ export const NewOrderForm: React.FC = () => {
     orderId
   })
   const [orderProduct, setOrderProduct] = useState<OrderProduct>({
+    deliver: new Date(),
     product: '',
     name: '',
+    price: 0,
     quantity: 1,
     location: ''
   })
@@ -43,7 +52,6 @@ export const NewOrderForm: React.FC = () => {
   const [debouncedProductQuery, setDebouncedProductQuery] = useState(searchProductQuery)
   const [products, setProducts] = useState<Product[]>([])
   const [isProductSelected, setIsProductSelected] = useState(false)
-  const [productPrice, setProductPrice] = useState<number>(0)
   const [show, setShow] = useState(false)
   const [showClientModal, setShowClientModal] = useState(false)
   const [signUrl, setSignUrl] = useState<string | undefined>('')
@@ -132,32 +140,32 @@ export const NewOrderForm: React.FC = () => {
     setOrderProduct((prevProduct) => ({
       ...prevProduct,
       product: product._id!,
-      name: product.name
+      name: product.name,
+      price: product.price
     }))
     setSearchProductQuery(product.name)
-    setProductPrice(product.price)
     setProducts([])
     setIsProductSelected(true)
   }
 
   const handleAddNewProduct = () => {
-    const total = productPrice * orderProduct.quantity
     setOrderProducts((prevProducts) => [...prevProducts, orderProduct])
     setOrder((prevState) => ({
       ...prevState,
-      totalValue: prevState.totalValue + total
+      products: [...prevState.products, orderProduct],
+      totalValue: calculateTotalValue(orderProduct, orderProducts)
     }))
     setOrderProduct({
+      deliver: new Date(),
       product: '',
       quantity: 1,
       name: '',
+      price: 0,
       deposit: undefined,
-      valuePerDay: undefined,
       return: undefined
     })
     setSearchProductQuery('')
     setDebouncedProductQuery('')
-    setProductPrice(0)
     setProducts([])
     setIsProductSelected(false)
   }
@@ -178,13 +186,23 @@ export const NewOrderForm: React.FC = () => {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    const updatedOrder = {
-      ...order,
-      products: orderProducts.length ? orderProducts : [orderProduct],
-      ...(!orderProducts.length && { totalValue: productPrice * orderProduct.quantity })
+    let updatedOrder: Order
+
+    if (orderProduct.name && orderProducts.length) {
+      updatedOrder = {
+        ...order,
+        products: [...orderProducts, orderProduct],
+        totalValue: calculateTotalValue(orderProduct, orderProducts)
+      }
+    } else {
+      updatedOrder = {
+        ...order,
+        products: orderProducts.length ? orderProducts : [orderProduct],
+        ...(!orderProducts.length && { totalValue: calculateTotalValue(orderProduct) })
+      }
     }
 
     setOrder(updatedOrder)
@@ -228,6 +246,19 @@ export const NewOrderForm: React.FC = () => {
   }
 
   const handleShow = () => setShow(true)
+
+  const handleLocationSelect = (location: LocationData) => {
+    setOrderProduct((prev) => ({ ...prev, location: location.address }))
+  }
+
+  const handleRemoveProduct = (product: OrderProduct) => {
+    setOrderProducts((prevProducts) => prevProducts.filter((p) => p !== product))
+    setOrder((prevOrder) => ({
+      ...prevOrder,
+      products: prevOrder.products.filter((p) => p !== product),
+      totalValue: prevOrder.totalValue - calculateTotalValue(product)
+    }))
+  }
 
   return (
     <Container className="mt-5">
@@ -321,10 +352,16 @@ export const NewOrderForm: React.FC = () => {
               <Form.Control
                 type="text"
                 name="product"
+                autoComplete="off"
                 value={searchProductQuery}
                 onChange={handleInputChange}
                 required={orderProducts.length ? false : orderProduct.product ? false : true}
               />
+              {orderProduct.price > 0 && (
+                <p>
+                  <b>Precio:</b> ${formatAmount(orderProduct.price)}
+                </p>
+              )}
             </Form.Group>
             {products.length > 0 && (
               <Dropdown.Menu
@@ -349,7 +386,7 @@ export const NewOrderForm: React.FC = () => {
               <Form.Control
                 type="datetime-local"
                 name="deliver"
-                value={order.deliver ? formatToDatetimeLocal(order.deliver) : ''}
+                value={formatToDatetimeLocal(orderProduct.deliver)}
                 onChange={handleInputChange}
                 required
               />
@@ -372,19 +409,6 @@ export const NewOrderForm: React.FC = () => {
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Deposito</Form.Label>
-              <Form.Control
-                type="number"
-                name="deposit"
-                value={orderProduct.deposit || ''}
-                onChange={handleInputChange}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3">
               <Form.Label>Fecha y hora de devolución</Form.Label>
               <Form.Control
                 type="datetime-local"
@@ -394,29 +418,34 @@ export const NewOrderForm: React.FC = () => {
               />
             </Form.Group>
           </Col>
+        </Row>
+        <Row>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Valor por día</Form.Label>
+              <Form.Label>Deposito</Form.Label>
               <Form.Control
                 type="number"
-                name="valuePerDay"
-                min="0"
-                value={orderProduct.valuePerDay || ''}
+                name="deposit"
+                value={orderProduct.deposit || ''}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Ubicación del producto</Form.Label>
+              <Form.Control
+                type="text"
+                name="location"
+                value={orderProduct.location || ''}
+                disabled
                 onChange={handleInputChange}
               />
             </Form.Group>
           </Col>
         </Row>
         <Row>
-          <Form.Group className="mb-3">
-            <Form.Label>Ubicación del producto</Form.Label>
-            <Form.Control
-              type="text"
-              name="location"
-              value={orderProduct.location || ''}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
+          <GoogleMaps onLocationSelect={handleLocationSelect} />
         </Row>
         <br />
         {signUrl && <img src={signUrl} alt="Signature" />}
@@ -437,7 +466,7 @@ export const NewOrderForm: React.FC = () => {
           </Button>
         </Modal>
 
-        <Button variant="primary" type="submit" disabled={!signUrl}>
+        <Button variant="primary" type="submit">
           Crear pedido
         </Button>
       </Form>
@@ -451,28 +480,49 @@ export const NewOrderForm: React.FC = () => {
               <th>#</th>
               <th>Nombre</th>
               <th>Cantidad</th>
-              <th>Valor por día</th>
+              <th>Precio</th>
               <th>Depósito</th>
               <th>Fecha de devolución</th>
+              <th>Días alquilados</th>
+              <th>Valor total</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {orderProducts.map((product, idx) => {
+              const total = calculateTotalValue(product)
+
               return (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
                   <td>{product.name}</td>
                   <td>{product.quantity}</td>
-                  <td>{product.valuePerDay || '-'}</td>
-                  <td>{product.deposit || '-'}</td>
-                  <td>{product.return?.toISOString() || '-'}</td>
-                  {/* <td>
-                    <Button variant="danger">Borrar</Button> // TODO: Add logic to remove product
-                  </td> */}
+                  <td>${formatAmount(product.price)}</td>
+                  <td>{product.deposit ? `$${formatAmount(product.deposit)}` : '-'}</td>
+                  <td>{product.return ? formatDate(product.return.toString()) : '-'}</td>
+                  <td>{product.return ? diffDays(product.deliver, product.return) : '-'}</td>
+                  <td>${formatAmount(total)}</td>
+                  <td>
+                    <Button variant="danger" onClick={() => handleRemoveProduct(product)}>
+                      Borrar
+                    </Button>
+                  </td>
                 </tr>
               )
             })}
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+                <b>Total: ${formatAmount(order.totalValue)}</b>
+              </td>
+              <td></td>
+            </tr>
           </tbody>
         </Table>
       )}

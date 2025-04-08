@@ -42,7 +42,7 @@ export const EachOrderPDF: React.FC<{ order: Order; user: User; signUrl: string 
         <View style={styles.divider}></View>
         <View style={styles.orderDetails}>
           <Text style={styles.orderDetailsText}>Nº pedido: {order.orderId}</Text>
-          <Text style={styles.orderDetailsText}>Fecha: {formatDate(order.deliver.toString(), true)}</Text>
+          <Text style={styles.orderDetailsText}>Fecha: {formatDate(order.createdAt!.toString(), true)}</Text>
         </View>
         <View style={styles.divider}></View>
         <View style={styles.orderProducts}>

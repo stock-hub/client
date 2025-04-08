@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../../../context/auth.context'
 import orderService from '../../../services/order.service'
 import { Order } from '../../../types/order.type'
-import { formatDate } from '../../../utils/tools'
+import { calculateTotalValue, diffDays, formatAmount, formatDate } from '../../../utils/tools'
 import {
   CompanyAddress,
   Container,
@@ -14,7 +14,6 @@ import {
   OrderProducts,
   UsersInfo
 } from './EachOrder.styled'
-import { Product } from '../../../types/product.type'
 import { Button } from 'react-bootstrap'
 
 export const EachOrder: React.FC<{ isDownload: boolean }> = ({ isDownload = false }) => {
@@ -65,29 +64,37 @@ export const EachOrder: React.FC<{ isDownload: boolean }> = ({ isDownload = fals
             <b>Nº pedido:</b> {order.orderId}
           </p>
           <p>
-            <b>Fecha:</b> {formatDate(order.deliver.toString(), true)}
+            <b>Fecha:</b> {formatDate(order.createdAt!.toString(), true)}
           </p>
         </OrderDetails>
         <Divider />
         <OrderProducts>
           <thead>
             <tr>
+              <th>#</th>
+              <th>Nombre</th>
               <th>Cantidad</th>
-              <th>Descripción</th>
               <th>Precio</th>
-              <th>Total</th>
+              <th>Depósito</th>
+              <th>Fecha de devolución</th>
+              <th>Días alquilados</th>
+              <th>Valor total</th>
             </tr>
           </thead>
           <tbody>
             {order.products.map((product, idx) => {
-              const total = (product.product as Product).price * product.quantity
+              const total = calculateTotalValue(product)
 
               return (
                 <tr key={idx}>
-                  <td>{product.quantity}</td>
+                  <td>{idx + 1}</td>
                   <td>{product.name}</td>
-                  <td>$ {(product.product as Product).price}</td>
-                  <td>$ {total}</td>
+                  <td>{product.quantity}</td>
+                  <td>${formatAmount(product.price)}</td>
+                  <td>{product.deposit ? `$${formatAmount(product.deposit)}` : '-'}</td>
+                  <td>{product.return ? formatDate(product.return.toString()) : '-'}</td>
+                  <td>{product.return ? diffDays(product.deliver, product.return) : '-'}</td>
+                  <td>${formatAmount(total)}</td>
                 </tr>
               )
             })}
@@ -95,7 +102,14 @@ export const EachOrder: React.FC<{ isDownload: boolean }> = ({ isDownload = fals
               <td></td>
               <td></td>
               <td></td>
-              <td>$ {order.totalValue}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+                <b>Total: ${formatAmount(order.totalValue)}</b>
+              </td>
+              <td></td>
             </tr>
           </tbody>
         </OrderProducts>

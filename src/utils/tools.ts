@@ -1,3 +1,5 @@
+import { OrderProduct } from '../types/order.type'
+
 export function titleize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -52,4 +54,24 @@ export function formatAmount(amount: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(amount)
+}
+
+export function diffDays(date1: Date, date2: Date): number {
+  const d1 = new Date(date1)
+  const d2 = new Date(date2)
+  const diffTime = Math.abs(d1.getTime() - d2.getTime())
+
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
+export function calculateTotalValue(orderProduct: OrderProduct, orderProducts?: OrderProduct[]) {
+  const calc = (product: OrderProduct) =>
+    product.quantity *
+    (product.return
+      ? product.price * diffDays(product.deliver, product.return)
+      : product.price + (product.deposit || 0))
+
+  return orderProducts
+    ? orderProducts.reduce((acc, product) => acc + calc(product), 0) + calc(orderProduct)
+    : calc(orderProduct)
 }

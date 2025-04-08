@@ -39,8 +39,6 @@ export const EditProductForm: React.FC<{ product: Product }> = ({ product }: { p
     const { name, value, checked } = e.target
 
     if (['onSell', 'inStock'].includes(name)) {
-      console.log('name', name)
-      console.log('checked', checked)
       setUpdatedProduct({
         ...updatedProduct,
         [name]: checked

@@ -4,8 +4,9 @@ import { User } from './user.type'
 export interface OrderProduct {
   product: string | Product
   name: string
+  price: number
   quantity: number
-  valuePerDay?: number
+  deliver: Date
   return?: Date
   deposit?: number
   location?: string
@@ -16,7 +17,6 @@ export interface Order {
   user?: User
   products: OrderProduct[]
   totalValue: number
-  deliver: Date
   clientName: string
   clientAddress: string
   clientId: string
